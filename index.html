@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Network+ Vocabulary Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Using Inter font as per previous flashcard app, index.html also uses Inter in its stack -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Inter', sans-serif, system-ui, -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+          'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+          'Segoe UI Symbol', 'Noto Color Emoji';
+        background-color: #f8fafc; /* slate-50 */
+        color: #334155; /* slate-700 */
+        overscroll-behavior-y: contain; /* Prevents pull-to-refresh on mobile */
+      }
+      .flashcard-container {
+        width: 100%;
+        max-width: 600px; /* Increased max-width for better readability */
+        min-height: 380px; /* Increased min-height */
+        perspective: 1500px; /* Increased perspective for smoother flip */
+      }
+      .flashcard {
+        width: 100%;
+        height: 100%;
+        min-height: 380px; /* Match container */
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: pointer;
+      }
+      .flashcard.flipped {
+        transform: rotateY(180deg);
+      }
+      .flashcard-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        min-height: 380px; /* Match container */
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px; /* p-6 */
+        box-sizing: border-box;
+        border-radius: 0.75rem; /* rounded-xl */
+        text-align: center;
+        overflow-y: auto; /* Enable scroll for long definitions */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+      }
+      .flashcard-front {
+        background-color: #38bdf8; /* sky-400 from index.html */
+        color: white;
+      }
+      .flashcard-back {
+        background-color: #2dd4bf; /* teal-400 from index.html */
+        color: #0f766e; /* teal-700 text for better contrast on teal-400 */
+        transform: rotateY(180deg);
+      }
+      .flashcard-label {
+        /* For "Term" and "Definition" labels inside the card */
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 700; /* font-bold */
+        color: rgba(255, 255, 255, 0.85); /* Adjusted for better visibility */
+        margin-bottom: 0.75rem; /* mb-3 */
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .flashcard-back .flashcard-label {
+        color: #134e4a; /* teal-900 - darker label on lighter back */
+      }
+      .flashcard-term-content {
+        font-size: 1.875rem; /* text-3xl */
+        font-weight: 700; /* font-bold */
+      }
+      .flashcard-definition-content {
+        font-size: 1.125rem; /* text-lg */
+        line-height: 1.6;
+      }
+      .flashcard-face::-webkit-scrollbar {
+        width: 10px;
+      }
+      .flashcard-face::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+      }
+      .flashcard-face::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+      }
+      .flashcard-face::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+      .category-button-style {
+        background-color: #0ea5e9; /* sky-500 */
+        color: white;
+        font-weight: 600; /* semibold */
+        padding: 0.75rem 1rem; /* py-3 px-4 */
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        transition: all 0.2s ease-in-out;
+        border: none; /* ensure no default border */
+      }
+      .category-button-style:hover {
+        background-color: #0284c7; /* sky-600 */
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+      }
+      .nav-button-style {
+        background-color: #475569; /* slate-600 */
+        color: white;
+        font-weight: 600; /* semibold */
+        padding: 0.625rem 1.25rem; /* py-2.5 px-5 */
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease-in-out;
+        border: none; /* ensure no default border */
+      }
+      .nav-button-style:hover:not(:disabled) {
+        background-color: #334155; /* slate-700 */
+        transform: translateY(-1px);
+      }
+      .nav-button-style:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .action-button-style {
+        background-color: #0d9488; /* teal-600 */
+        color: white;
+        font-weight: 600; /* semibold */
+        padding: 0.625rem 1.25rem; /* py-2.5 px-5 */
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease-in-out;
+        border: none; /* ensure no default border */
+      }
+      .action-button-style:hover {
+        background-color: #0f766e; /* teal-700 */
+        transform: translateY(-1px);
+      }
+      /* Loading and Error Message Styling from original flashcard_app_network_vocab */
+      #loading-message-container,
+      #error-message-container {
+        text-align: center;
+        font-size: 1.125rem; /* text-lg */
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin: 1rem auto;
+        max-width: 600px;
+      }
+      #loading-message-container {
+        background-color: #ebf8ff; /* Tailwind blue-100 */
+        color: #2b6cb0; /* Tailwind blue-700 */
+      }
+      #error-message-container {
+        background-color: #fed7d7; /* Tailwind red-100 */
+        color: #c53030; /* Tailwind red-700 */
+      }
+    </style>
+  </head>
+  <body
+    class="flex flex-col items-center justify-center min-h-screen p-4 selection:bg-sky-100 selection:text-sky-700"
+  >
+    <main
+      class="container mx-auto p-5 sm:p-8 bg-white shadow-xl rounded-lg w-full max-w-4xl"
+    >
+      <header class="text-center mb-8">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-sky-600">
+          Network+ Vocabulary Flashcards
+        </h1>
+      </header>
+
+      <div id="loading-message-container" class="hidden">
+        Loading vocabulary... Please wait.
+      </div>
+      <div id="error-message-container" class="hidden">
+        Error loading vocabulary.
+      </div>
+
+      <section id="category-selection-view">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-center text-slate-700 mb-4"
+        >
+          Welcome, Network+ Aspirant!
+        </h2>
+        <p class="text-center text-slate-600 mb-8 text-lg leading-relaxed">
+          This interactive flashcard tool is designed to help you master the
+          extensive vocabulary for the CompTIA Network+ exam. Select a category
+          below to dive into specific topics. Click on any card to reveal its
+          definition. Good luck!
+        </p>
+        <div
+          id="category-buttons-container"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5"
+        >
+          <!-- Category buttons will be populated here by JavaScript -->
+        </div>
+      </section>
+
+      <section id="flashcard-view" class="hidden">
+        <div class="text-center mb-6">
+          <p class="text-2xl font-semibold text-teal-600">
+            Category:
+            <span id="current-category-display" class="font-bold"></span>
+          </p>
+          <p class="text-lg text-slate-500 mt-1" id="card-counter">
+            Card 0 of 0
+          </p>
+        </div>
+        <p class="text-center text-slate-600 mb-6 text-md leading-relaxed">
+          Click the card below to flip between the term and its definition. Use
+          the "Previous" and "Next" buttons to navigate through your selected
+          deck. Press "Choose New Category" to explore other topics.
+        </p>
+
+        <div class="flashcard-container mx-auto mb-8">
+          <div id="flashcard" class="flashcard">
+            <div class="flashcard-face flashcard-front">
+              <div>
+                <div class="flashcard-label">Term</div>
+                <div
+                  id="flashcard-term-content"
+                  class="flashcard-term-content"
+                ></div>
+              </div>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <div>
+                <div class="flashcard-label">Definition</div>
+                <div
+                  id="flashcard-definition-content"
+                  class="flashcard-definition-content"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center items-center space-x-4 mb-8">
+          <button id="prev-card-button" class="nav-button-style">
+            <span>&#9664;</span> Previous
+          </button>
+          <button id="next-card-button" class="nav-button-style">
+            Next <span>&#9654;</span>
+          </button>
+        </div>
+
+        <div class="text-center">
+          <button id="return-to-categories-button" class="action-button-style">
+            Choose New Category
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center mt-10 mb-6 text-sm text-slate-500">
+      <p>&copy; <span id="current-year"></span> Osiris Loera</p>
+    </footer>
+
+    <script>
+      // This will hold the vocabulary data structured as:
+      // { "CategoryName": [{ term: "Term1", definition: "Definition1" }, ...], ... }
+      let structuredVocabularyData = {}
+      let currentCategory = ''
+      let currentCardIndex = 0
+      let cardsInCurrentCategory = []
+
+      const loadingMessageDiv = document.getElementById(
+        'loading-message-container'
+      )
+      const errorMessageDiv = document.getElementById('error-message-container')
+
+      const categorySelectionView = document.getElementById(
+        'category-selection-view'
+      )
+      const flashcardView = document.getElementById('flashcard-view')
+      const categoryButtonsContainer = document.getElementById(
+        'category-buttons-container'
+      )
+
+      const currentCategoryDisplay = document.getElementById(
+        'current-category-display'
+      )
+      const cardCounterDisplay = document.getElementById('card-counter')
+      const flashcardDiv = document.getElementById('flashcard')
+      const flashcardTermContentDiv = document.getElementById(
+        'flashcard-term-content'
+      )
+      const flashcardDefinitionContentDiv = document.getElementById(
+        'flashcard-definition-content'
+      )
+
+      const prevCardButton = document.getElementById('prev-card-button')
+      const nextCardButton = document.getElementById('next-card-button')
+      const returnToCategoriesButton = document.getElementById(
+        'return-to-categories-button'
+      )
+
+      document.getElementById('current-year').textContent =
+        new Date().getFullYear()
+
+      // Function to parse the Markdown content
+      function parseMarkdownToStructuredData(markdown) {
+        const lines = markdown.split('\n')
+        let currentCategoryName = 'Uncategorized' // Default category
+        const parsedData = {}
+
+        for (const line of lines) {
+          const trimmedLine = line.trim()
+          if (trimmedLine.startsWith('## ')) {
+            // Main category heading
+            currentCategoryName = trimmedLine
+              .substring(3)
+              .trim()
+              .replace(/^\d+\.\s*/, '')
+            if (!parsedData[currentCategoryName]) {
+              parsedData[currentCategoryName] = []
+            }
+          } else if (trimmedLine.startsWith('* **')) {
+            // Term and definition
+            const match = trimmedLine.match(/^\*\s*\*\*(.*?):\*\*\s*(.*)/)
+            if (match && match[1] && match[2]) {
+              const term = match[1].trim()
+              let definition = match[2].trim()
+
+              let nextLineIndex = lines.indexOf(line) + 1
+              while (
+                nextLineIndex < lines.length &&
+                lines[nextLineIndex].trim() !== '' &&
+                !lines[nextLineIndex].trim().startsWith('* **') &&
+                !lines[nextLineIndex].trim().startsWith('## ')
+              ) {
+                const continuation = lines[nextLineIndex].trim()
+                if (
+                  continuation.startsWith('    *') ||
+                  continuation.startsWith('  *') ||
+                  continuation.startsWith('    -') ||
+                  continuation.startsWith('  -')
+                ) {
+                  definition += `\n  ${continuation}` // Keep sub-bullet indentation
+                } else if (continuation) {
+                  definition += ` ${continuation}`
+                }
+                nextLineIndex++
+              }
+              definition = definition
+                .replace(/\(\s*See\s+.*?\s*\)/gi, '')
+                .trim() // Remove "(See ...)"
+
+              if (term && definition) {
+                if (!parsedData[currentCategoryName]) {
+                  // Ensure category exists
+                  parsedData[currentCategoryName] = []
+                }
+                parsedData[currentCategoryName].push({ term, definition })
+              }
+            }
+          }
+        }
+        return parsedData
+      }
+
+      async function loadVocabulary() {
+        loadingMessageDiv.classList.remove('hidden')
+        categorySelectionView.classList.add('hidden')
+        flashcardView.classList.add('hidden')
+        errorMessageDiv.classList.add('hidden')
+
+        try {
+          // The FULL Markdown content from your previous document.
+          // IMPORTANT: This must be the complete Network+ vocabulary list.
+          const markdownContent = `
+# Comprehensive CompTIA Network+ Vocabulary List
+
+This list provides definitions for common and advanced terms, acronyms, and concepts in IT networking, specifically geared towards individuals preparing for the CompTIA Network+ certification (N10-008 / N10-009).
+
+## 1. General Networking Concepts
+
+* **Network:** A group of two or more interconnected devices (like computers, printers, servers) that can exchange data and share resources.
+* **Internet:** A global network of interconnected computer networks that use the Internet protocol suite (TCP/IP) to link devices worldwide.
+* **Intranet:** A private network contained within an enterprise. It may consist of many interlinked local area networks and also use leased lines in the wide area network.
+* **Extranet:** A controlled private network that allows access to partners, vendors, and suppliers or an authorized set of customers – normally to a subset of the information accessible from an organization's intranet.
+* **Client:** A device or software application that requests services or resources from a server.
+* **Server:** A computer or system that provides resources, data, services, or programs to other computers, known as clients, over a network.
+* **Node:** Any device connected to a network that can send, receive, or forward information. This includes computers, printers, routers, switches, etc.
+* **Host:** Any device on a network that has an IP address. Often used interchangeably with "node," but typically refers to end devices like computers and servers.
+* **Bandwidth:** The maximum rate of data transfer across a given path. It's a measure of network capacity, often expressed in bits per second (bps), kilobits per second (Kbps), megabits per second (Mbps), or gigabits per second (Gbps).
+* **Latency:** The delay before a transfer of data begins following an instruction for its transfer. In networking, it's the time it takes for a data packet to travel from its source to its destination. Measured in milliseconds (ms).
+* **Round Trip Time (RTT):** The time it takes for a signal to be sent plus the time it takes for an acknowledgment of that signal to be received.
+* **Jitter:** Variation in the delay of received packets. Affects real-time applications like VoIP and video streaming.
+* **Throughput:** The actual rate of data transfer that is achieved over a network, as opposed to the theoretical maximum (bandwidth).
+* **Goodput:** The amount of usable data that crosses a given point in a network over a certain period of time, excluding overhead like retransmissions or protocol headers.
+* **Packet/Datagram:** A small unit of data transmitted over a packet-switched network. Data is broken down into packets for more efficient transmission and reassembled at the destination.
+* **Frame:** A Data Link layer (Layer 2) PDU (Protocol Data Unit) that encapsulates a Layer 3 packet.
+* **Segment:** A Transport Layer (Layer 4) PDU, typically referring to TCP segments.
+* **Encapsulation:** The process of adding control information (headers and sometimes trailers) to data as it passes down the OSI or TCP/IP model layers.
+* **De-encapsulation (Decapsulation):** The process of removing headers and trailers as data moves up the OSI or TCP/IP model layers.
+* **Data Collision:** A situation that occurs when two or more devices attempt to transmit data over a shared network medium (like old Ethernet hubs or half-duplex links) at the same time, resulting in corrupted data.
+* **Collision Domain:** A section of a network where data packets can collide with one another when being sent on a shared medium. Switches break up collision domains.
+* **Broadcast Domain:** A logical area of a computer network where any computer connected to the network can transmit directly to all other computers in the same domain without going through a router. Routers break up broadcast domains.
+* **Broadcast:** A method of data transmission where a single message is sent from one point to all other nodes on a network segment or within a broadcast domain.
+* **Unicast:** A method of data transmission from one point to another single point.
+* **Multicast:** A method of data transmission from one point to a selected group of other points (subscribers) on a network. (e.g., IGMP)
+* **Anycast:** A network addressing and routing methodology in which datagrams from a single sender are routed to the topologically nearest node in a group of potential receivers, all identified by the same destination address. Common in IPv6 and for DNS services.
+* **Simplex:** Communication that occurs in one direction only (e.g., a traditional radio broadcast).
+* **Half-Duplex:** Communication that can occur in both directions, but only one direction at a time (e.g., walkie-talkies).
+* **Full-Duplex:** Communication that can occur in both directions simultaneously (e.g., a telephone conversation, modern switched Ethernet).
+* **Client-Server Model:** A distributed application structure that partitions tasks or workloads between the providers of a resource or service, called servers, and service requesters, called clients.
+* **Peer-to-Peer (P2P) Model:** A decentralized communications model where each party has the same capabilities and either party can initiate a communication session. (e.g., file-sharing applications).
+* **Scalability:** The ability of a system, network, or process to handle a growing amount of work, or its potential to be enlarged to accommodate that growth.
+* **Availability (High Availability):** The percentage of time that a system or network is operational and accessible. High availability systems aim for minimal downtime.
+* **Redundancy:** The duplication of critical components or functions of a system with the intention of increasing reliability of the system, usually in the form of a backup or fail-safe, or to improve actual system performance.
+* **Fault Tolerance:** The property that enables a system to continue operating properly in the event of the failure of (or one or more faults within) some of its components.
+* **MTBF (Mean Time Between Failures):** A measure of the predicted elapsed time between inherent failures of a mechanical or electronic system, during normal system operation.
+* **MTTR (Mean Time To Repair/Resolve/Recover):** The average time required to repair a failed component or device, or resolve an issue.
+* **SLA (Service Level Agreement):** A contract between a service provider and a customer that defines the level of service expected from the service provider. Includes metrics like uptime, response time, etc.
+
+## 2. Network Topologies and Architectures
+
+* **Topology:** The physical or logical arrangement of nodes and connections within a network.
+  * **Physical Topology:** The actual layout of the network cables and devices.
+  * **Logical Topology:** How data travels between devices on the network, regardless of their physical connections.
+* **Common Physical Topologies:**
+  * **Bus Topology:** All devices are connected to a single central cable (the bus or backbone). Older technology, prone to single points of failure.
+  * **Star Topology:** All devices are connected to a central device, like a switch or hub. Most common LAN topology.
+    * **Hub-and-Spoke:** A type of star topology common in WANs where a central site (hub) connects to multiple remote sites (spokes).
+  * **Ring Topology:** Devices are connected in a circular fashion. Data passes from one device to the next. (e.g., FDDI, Token Ring - older).
+  * **Mesh Topology:**
+    * **Full Mesh:** Every device is connected to every other device. High redundancy but complex and expensive.
+    * **Partial Mesh:** Some devices are connected to multiple other devices, but not all. Provides a balance of redundancy and cost.
+  * **Tree Topology (Hierarchical Topology):** A hybrid topology that combines characteristics of bus and star topologies. Has a root node, and other nodes are connected in a hierarchical fashion.
+  * **Hybrid Topology:** A combination of two or more different basic network topologies.
+* **Modern Architectures:**
+  * **Spine and Leaf:** A two-tier data center network topology where leaf switches connect to servers and storage, and spine switches interconnect all leaf switches. Offers high bandwidth, low latency, and easy scalability.
+  * **Three-Tier Architecture (Traditional):** Consists of Core, Distribution/Aggregation, and Access layers.
+    * **Access Layer:** Connects end-user devices to the network (e.g., switches connecting PCs).
+    * **Distribution/Aggregation Layer:** Aggregates traffic from the access layer, applies policies, and routes traffic between VLANs.
+    * **Core Layer:** Provides high-speed backbone connectivity between distribution layer devices and to external networks.
+* **Demarcation Point (Demarc):** The point at which the public switched telephone network ends and connects with the customer's on-premises wiring. It's where the ISP's responsibility ends and the customer's begins.
+* **Smart Jack (NIU - Network Interface Unit):** A device that serves as the demarcation point between the carrier's local loop and the customer's premises wiring. Can have diagnostic capabilities.
+* **MDF (Main Distribution Frame):** A cable rack that interconnects and manages telecommunications wiring between itself and any number of IDFs. The primary hub for telecommunications cabling in a building.
+* **IDF (Intermediate Distribution Frame):** A cable rack that connects to the MDF and provides connections to local workstations or devices in a specific area or floor.
+* **25 Pair / 50 Pair / 100 Pair / 66 Block / 110 Block / Krone Block / BIX Block:** Types of punch-down blocks used for connecting and terminating telecommunications wiring (e.g., telephone and network cables) in wiring closets (MDF/IDF).
+  * **66 Block:** Older type, primarily for voice.
+  * **110 Block:** More common for data (Ethernet), higher density than 66 blocks.
+* **Patch Panel:** A device featuring a number of jacks, usually of the same or similar type, for the use of connecting and routing circuits for monitoring, interconnecting, and testing circuits in a convenient, flexible manner. Used to terminate horizontal cabling runs.
+
+## 3. Network Types
+
+* **LAN (Local Area Network):** A network that connects devices within a limited geographical area, such as a home, office building, or campus.
+* **WLAN (Wireless Local Area Network):** A LAN that uses wireless communication (like Wi-Fi) instead of wired connections.
+* **WAN (Wide Area Network):** A network that spans a large geographical area, such as a city, country, or even across continents. The internet is the largest WAN.
+* **MAN (Metropolitan Area Network):** A network that interconnects users with computer resources in a geographic area or region larger than that covered by even a large LAN but smaller than a WAN.
+* **PAN (Personal Area Network):** A network for interconnecting devices centered on an individual person's workspace (e.g., Bluetooth connecting a keyboard, mouse, and headset).
+* **CAN (Campus Area Network):** A network that interconnects multiple LANs within a limited geographical area like a university campus, industrial park, or corporate campus. Larger than a LAN, smaller than a MAN.
+* **SAN (Storage Area Network):** A dedicated, high-speed network (or subnetwork) that interconnects and presents shared pools of storage devices (e.g., disk arrays, tape libraries) to multiple servers. Uses protocols like Fibre Channel or iSCSI.
+* **NAS (Network Attached Storage):** A file-level computer data storage server connected to a computer network providing data access to a heterogeneous group of clients.
+* **VPN (Virtual Private Network):** A secure, encrypted connection (a "tunnel") over a public network (like the internet) that allows users to send and receive data as if their computing devices were directly connected to a private network.
+  * **Site-to-Site VPN:** Connects two or more entire networks (e.g., linking a branch office network to a main office network).
+  * **Client-to-Site VPN (Remote Access VPN):** Allows individual users to connect securely to a private network from a remote location.
+  * **SSL VPN/TLS VPN:** Uses SSL/TLS protocols to provide secure remote access, often through a web browser or client application.
+  * **IPsec VPN:** Uses the IPsec protocol suite to secure communications.
+* **VLAN (Virtual Local Area Network):** A logical grouping of devices on one or more LANs that are configured to communicate as if they were attached to the same wire, when in fact they are located on a number of different LAN segments. VLANs are based on logical instead of physical connections, allowing for segmentation and broadcast domain separation on a switch.
+* **SD-WAN (Software-Defined Wide Area Network):** An application of SDN technology to WAN connections. It simplifies the management and operation of a WAN by decoupling the networking hardware from its control mechanism. Allows for centralized control, application-aware routing, and transport agnostic links.
+* **MPLS (Multiprotocol Label Switching):** A routing technique in telecommunications networks that directs data from one node to the next based on short path labels rather than long network addresses, avoiding complex lookups in a routing table. Often used by service providers.
+* **mGRE (Multipoint Generic Routing Encapsulation):** Used in DMVPN (Dynamic Multipoint VPN) to allow dynamic tunnel creation between spoke sites without requiring static configuration on the hub.
+
+## 4. OSI Model (Open Systems Interconnection Model)
+
+A conceptual framework used to understand standard network interactions. It is divided into seven layers:
+
+* **Layer 7: Application Layer:** Interfaces directly with applications and provides common application services. Responsible for data generation. (Protocols: HTTP, HTTPS, FTP, SMTP, DNS, Telnet, SSH, SNMP, DHCP). PDU: Data.
+* **Layer 6: Presentation Layer:** Translates, encrypts, and compresses data. Ensures data is in a usable format for the Application Layer (e.g., character encoding, data formatting). (Formats: ASCII, EBCDIC, JPEG, GIF, MPEG, SSL/TLS for encryption). PDU: Data.
+* **Layer 5: Session Layer:** Manages connections (sessions) between applications. Establishes, manages, and terminates sessions (e.g., login/logout, synchronization). (Protocols: NetBIOS, PPTP, RPC). PDU: Data.
+* **Layer 4: Transport Layer:** Provides reliable or unreliable delivery and error recovery of data segments between hosts. Manages end-to-end communication, flow control, and port addressing. (Protocols: TCP, UDP). PDU: Segment (TCP), Datagram (UDP).
+* **Layer 3: Network Layer:** Responsible for logical addressing (IP addresses), path determination, and routing of packets between networks. (Protocols: IP, ICMP, ARP, RIP, OSPF, EIGRP, BGP. Devices: Routers, Layer 3 Switches). PDU: Packet.
+* **Layer 2: Data Link Layer:** Provides node-to-node data transfer (frames) and handles error detection from the physical layer. Manages physical addressing (MAC addresses) and access to the physical medium. Divided into two sublayers:
+  * **LLC (Logical Link Control):** Manages communication between devices over a single link of a network.
+  * **MAC (Media Access Control):** Controls how devices in a network gain access to medium and permission to transmit data.
+    (Protocols/Technologies: Ethernet, Wi-Fi, MAC addresses, PPP, Frame Relay, ATM. Devices: Switches, Bridges, NICs, WAPs). PDU: Frame.
+* **Layer 1: Physical Layer:** Transmits raw bit streams (0s and 1s) over the physical medium. Defines electrical, mechanical, procedural, and functional specifications for activating, maintaining, and deactivating the physical link. (Hardware: Cables, Hubs, NICs, Repeaters, Transceivers, Connectors). PDU: Bit.
+
+## 5. TCP/IP Model (DoD Model)
+
+A more common and practical model compared to OSI.
+
+* **Application Layer:** Combines OSI Layers 5, 6, and 7. (HTTP, FTP, DNS, SMTP, etc.)
+* **Transport Layer:** Maps to OSI Layer 4. (TCP, UDP)
+* **Internet Layer (or Network Layer):** Maps to OSI Layer 3. (IP, ICMP, ARP)
+* **Network Interface Layer (or Link Layer / Network Access Layer):** Combines OSI Layers 1 and 2. (Ethernet, Wi-Fi, MAC addresses)
+
+## 6. Network Hardware
+
+* **NIC (Network Interface Card / Controller):** A hardware component, typically a circuit board or chip, installed in a computer so that it can connect to a network. Each NIC has a unique MAC address.
+* **Router:** A Layer 3 device that forwards data packets between different computer networks based on IP addresses. Routers create broadcast domains.
+* **Switch:** A Layer 2 device that connects devices together on a computer network by using packet switching (based on MAC addresses) to receive, process, and forward data to the destination device. Switches create separate collision domains for each port.
+  * **Layer 3 Switch (Multilayer Switch):** A switch that can perform Layer 3 routing functions in addition to Layer 2 switching.
+  * **Managed Switch:** A switch that can be configured and managed, offering features like VLANs, STP, QoS, port security, etc.
+  * **Unmanaged Switch:** A plug-and-play switch with no configuration options.
+* **Hub:** An older Layer 1 device that connects multiple Ethernet devices, making them act as a single network segment. It broadcasts all data received on one port to all other ports, creating a single collision domain. Largely replaced by switches.
+* **Bridge:** A Layer 2 device that connects two or more network segments, forwarding traffic between them based on MAC addresses. Older than switches, with fewer ports.
+* **Gateway:** A node (often a router or firewall) that serves as an access point to another network, often connecting a private network to the internet.
+* **Modem (Modulator-Demodulator):** A device that converts digital signals from a computer into analog signals for transmission over analog lines (like DSL or cable TV lines) and converts received analog signals back into digital signals.
+* **WAP (Wireless Access Point):** A networking hardware device that allows Wi-Fi compliant devices to connect to a wired network. Creates a WLAN.
+* **Wireless LAN Controller (WLC):** A centralized device that manages multiple WAPs, providing features like configuration, security, and monitoring for a large wireless network.
+* **Repeater/Extender:** A Layer 1 device used to regenerate or replicate a signal to extend the distance over which data can travel.
+* **Firewall:** A network security device (hardware or software) that monitors incoming and outgoing network traffic and decides whether to allow or block specific traffic based on a defined set of security rules.
+  * **Stateful Firewall:** Tracks the state of active connections and makes decisions based on the context of the traffic.
+  * **Stateless Firewall (Packet Filtering Firewall):** Makes decisions based on individual packets in isolation, using source/destination IP addresses and ports.
+  * **NGFW (Next-Generation Firewall):** Combines traditional firewall features with advanced capabilities like deep packet inspection (DPI), intrusion prevention (IPS), application awareness, and threat intelligence.
+  * **Appliance Firewall:** A dedicated hardware device.
+  * **Host-based Firewall:** Software running on an individual computer.
+* **Load Balancer:** A device that distributes network or application traffic across multiple servers to improve responsiveness and availability of applications.
+* **Proxy Server:** A server that acts as an intermediary for requests from clients seeking resources from other servers. Can provide caching, filtering, and anonymity.
+  * **Forward Proxy:** Used by clients to access the internet.
+  * **Reverse Proxy:** Used by servers to control access from the internet to internal servers.
+* **Content Filter:** A device or software that screens and excludes from access or availability Web pages or e-mail that is deemed objectionable.
+* **VPN Concentrator:** A dedicated hardware device designed to handle a large number of incoming VPN tunnels.
+* **IDS (Intrusion Detection System):** Monitors network or system activities for malicious activities or policy violations and logs/alerts.
+  * **NIDS (Network-based IDS):** Monitors traffic on the network.
+  * **HIDS (Host-based IDS):** Monitors activity on a specific host.
+* **IPS (Intrusion Prevention System):** Monitors network/system activities and can actively block or prevent detected intrusions.
+* **Transceiver:** A device that can both transmit and receive signals. In networking, often refers to small, modular components that plug into switches or routers to provide network connectivity over different media types (e.g., copper, fiber).
+  * **SFP (Small Form-factor Pluggable):** A compact, hot-pluggable transceiver used for 1 Gbps (Gigabit Ethernet) and Fibre Channel.
+  * **SFP+ (Enhanced Small Form-factor Pluggable):** Supports speeds up to 10 Gbps. Same form factor as SFP.
+  * **QSFP (Quad Small Form-factor Pluggable):** Supports higher speeds, e.g., 40 Gbps (4x10 Gbps) or 100 Gbps (4x25 Gbps).
+  * **QSFP+ (Enhanced Quad Small Form-factor Pluggable):** Similar to QSFP, often used for 40 Gbps.
+  * **QSFP28:** Supports 100 Gbps (4x25 Gbps or 1x100 Gbps).
+  * **GBIC (Gigabit Interface Converter):** Older, larger predecessor to SFP.
+* **Media Converter:** A device that converts signals from one type of network media to another (e.g., copper Ethernet to fiber optic).
+* **CSU/DSU (Channel Service Unit/Data Service Unit):** Devices used to connect a DTE (Data Terminal Equipment, e.g., a router) to a digital circuit, like a T1 or T3 line. The CSU terminates the digital signal from the provider, and the DSU converts it into a format the DTE can understand.
+
+## 7. Network Cables and Connectors
+
+* **Twisted Pair Cable:** Consists of pairs of insulated copper wires twisted together to reduce electromagnetic interference (EMI) and crosstalk.
+  * **UTP (Unshielded Twisted Pair):** Most common type for Ethernet LANs. No metallic shielding.
+  * **STP (Shielded Twisted Pair) / ScTP (Screened Twisted Pair):** Has a metallic shield to further reduce interference. Used in electrically noisy environments.
+  * **Categories:**
+    * **Cat 3:** Older, for voice and 10 Mbps Ethernet.
+    * **Cat 5:** Supports 100 Mbps Ethernet.
+    * **Cat 5e (Enhanced):** Supports 1 Gbps Ethernet over 100 meters. Reduced crosstalk compared to Cat 5.
+    * **Cat 6:** Supports 1 Gbps up to 100 meters and 10 Gbps up to 55 meters. Tighter twists, more robust.
+    * **Cat 6a (Augmented):** Supports 10 Gbps up to 100 meters. Better shielding than Cat 6.
+    * **Cat 7:** Shielded, supports 10 Gbps up to 100 meters. Stricter specifications. Uses GG45 or TERA connectors (though often terminated with RJ45 compatible connectors).
+    * **Cat 8:** Shielded, designed for data centers, supports 25 Gbps or 40 Gbps up to 30 meters.
+  * **RJ45 Connector (Registered Jack 45):** Standard 8-pin connector used with twisted pair cables for Ethernet.
+  * **RJ11 Connector (Registered Jack 11):** Smaller 6-pin (typically 4-wire) connector used for telephone lines.
+* **Coaxial Cable (Coax):** Consists of a central conductor, an insulating layer, a metallic shield, and an outer insulating layer.
+  * **RG-6:** Common for cable television (CATV) and cable modems.
+  * **RG-59:** Older, thinner, used for CCTV and older cable TV.
+  * **F-type Connector:** Threaded connector used with coaxial cables for CATV and cable modems.
+  * **BNC Connector (Bayonet Neill-Concelman):** Locking connector used with older coaxial Ethernet (10BASE2) and some video applications.
+* **Fiber Optic Cable:** Transmits data as pulses of light through thin strands of glass (core) surrounded by cladding and a protective jacket. Offers high bandwidth, long-distance transmission, and immunity to EMI.
+  * **SMF (Single-Mode Fiber):** Has a small core (around 9 microns), uses lasers as a light source, and supports very long distances and high bandwidth. More expensive.
+  * **MMF (Multi-Mode Fiber):** Has a larger core (50 or 62.5 microns), uses LEDs or VCSELs as a light source, and is used for shorter distances (e.g., within a building or campus). Less expensive than SMF.
+  * **Fiber Connector Types:**
+    * **LC (Lucent Connector / Little Connector):** Small form factor, common in SFP transceivers.
+    * **SC (Subscriber Connector / Square Connector):** Push-pull connector.
+    * **ST (Straight Tip Connector):** Bayonet-style connector, older but still used.
+    * **MT-RJ (Mechanical Transfer Registered Jack):** Small duplex connector.
+    * **FC (Ferrule Connector):** Threaded connector, used in high-vibration environments.
+  * **UPC (Ultra Physical Contact):** Fiber connector end-face polish that minimizes back reflection. Blue connector.
+  * **APC (Angled Physical Contact):** Fiber connector end-face polished at an angle (typically 8 degrees) to further reduce back reflection. Green connector. Not compatible with UPC.
+* **Twinaxial Cable (Twinax):** A type of balanced pair cable similar to coaxial but with two inner conductors. Used for short-range, high-speed connections like SFP+ and QSFP+ direct attach cables (DAC) in data centers.
+* **Wiring Standards (for RJ45):**
+  * **T568A:** A specific pinout standard for terminating twisted pair cables. (GW-G-OW-BL-BLW-O-BRW-BR)
+  * **T568B:** Another pinout standard. More common in the US. (OW-O-GW-BL-BLW-G-BRW-BR)
+* **Cable Types based on Pinout:**
+  * **Straight-Through Cable:** Both ends use the same wiring standard (e.g., T568B on both ends). Used to connect dissimilar devices (e.g., PC to switch, router to switch).
+  * **Crossover Cable:** One end uses T568A and the other T568B (transmit and receive pairs are crossed). Used to connect similar devices directly (e.g., PC to PC, switch to switch, router to router - though Auto-MDI/MDI-X makes this less necessary now).
+  * **Rollover Cable (Console Cable):** Pinout is reversed on one end. Used to connect a PC to the console port of a router or switch for management. Typically light blue.
+* **Plenum-Rated Cable:** Cable with a fire-retardant jacket (e.g., Low Smoke Zero Halogen - LSZH) designed for use in plenum spaces (areas above ceilings or below floors used for air circulation) to minimize toxic smoke in case of a fire.
+* **Riser-Rated Cable (CMR):** Cable designed for vertical runs between floors in non-plenum spaces. Less stringent fire resistance than plenum.
+* **PVC (Polyvinyl Chloride) Cable:** Standard cable jacket, not suitable for plenum or riser applications due to smoke and fire characteristics.
+* **Wavelength Division Multiplexing (WDM):** A technology that multiplexes a number of optical carrier signals onto a single optical fiber by using different wavelengths (colors) of laser light.
+  * **CWDM (Coarse Wavelength Division Multiplexing):** Fewer channels, wider spacing, less expensive.
+  * **DWDM (Dense Wavelength Division Multiplexing):** Many channels, narrow spacing, more expensive, for very high capacity links.
+  * **BiDi (Bidirectional) WDM:** Uses different wavelengths for transmit and receive on a single fiber strand, effectively doubling fiber capacity.
+* **Ethernet Standards (Physical Layer):**
+  * **10BASE-T:** 10 Mbps over Cat 3+ UTP.
+  * **100BASE-TX (Fast Ethernet):** 100 Mbps over Cat 5+ UTP.
+  * **1000BASE-T (Gigabit Ethernet):** 1 Gbps over Cat 5e+ UTP.
+  * **10GBASE-T:** 10 Gbps over Cat 6a/7 UTP.
+  * **40GBASE-T:** 40 Gbps over Cat 8 UTP.
+  * **100BASE-FX:** 100 Mbps Fast Ethernet over MMF.
+  * **1000BASE-SX:** 1 Gbps Gigabit Ethernet over MMF (short wavelength).
+  * **1000BASE-LX:** 1 Gbps Gigabit Ethernet over SMF or MMF (long wavelength).
+  * **10GBASE-SR (Short Reach):** 10 Gbps over MMF.
+  * **10GBASE-LR (Long Reach):** 10 Gbps over SMF.
+  * **10GBASE-ER (Extended Reach):** 10 Gbps over SMF (very long distances).
+
+## 8. Network Protocols & Standards (General & Application)
+
+* **Protocol:** A set of rules and conventions that govern how data is formatted, transmitted, and received between network devices.
+* **Standard:** An agreed-upon set of rules or specifications that ensure interoperability between different vendors and technologies. (e.g., IEEE 802.3 for Ethernet, IEEE 802.11 for Wi-Fi).
+* **TCP/IP (Transmission Control Protocol/Internet Protocol):** The foundational suite of communication protocols used for the internet and most other computer networks.
+  * **IP (Internet Protocol):** Layer 3 protocol responsible for logical addressing (IP addresses) and routing packets across networks. Connectionless.
+  * **TCP (Transmission Control Protocol):** Layer 4 connection-oriented protocol that provides reliable, ordered, and error-checked delivery of data. Uses a three-way handshake to establish connections.
+  * **UDP (User Datagram Protocol):** Layer 4 connectionless protocol that provides a lightweight, unreliable, datagram-based service. Faster than TCP but doesn't guarantee delivery or order.
+* **HTTP (Hypertext Transfer Protocol):** Application layer protocol (Port 80) used for transmitting hypermedia documents (e.g., web pages).
+* **HTTPS (Hypertext Transfer Protocol Secure):** Secure version of HTTP (Port 443) that encrypts communication using SSL/TLS.
+* **FTP (File Transfer Protocol):** Application layer protocol (Ports 20, 21) used for transferring files between a client and server.
+  * **Active FTP:** Server initiates data connection back to client.
+  * **Passive FTP:** Client initiates data connection to server.
+* **SFTP (SSH File Transfer Protocol or Secure File Transfer Protocol):** Application layer protocol (usually Port 22, as it runs over SSH) providing secure file transfer, access, and management.
+* **FTPS (FTP Secure):** FTP secured with SSL/TLS (Ports 989/990 or uses explicit security on Port 21).
+* **TFTP (Trivial File Transfer Protocol):** Simplified version of FTP (Port 69 UDP). Connectionless, no authentication. Used for network booting or transferring configuration files.
+* **SMTP (Simple Mail Transfer Protocol):** Application layer protocol (Port 25) used for sending email messages between servers and from email clients to servers.
+* **POP3 (Post Office Protocol version 3):** Application layer protocol (Port 110, Secure Port 995) used by email clients to retrieve email messages from a mail server. Typically downloads and deletes messages from server.
+* **IMAP (Internet Message Access Protocol version 4):** Application layer protocol (Port 143, Secure Port 993) used by email clients to retrieve email messages. Messages usually remain on the server, allowing synchronization across multiple clients.
+* **Telnet:** Application layer protocol (Port 23) for remote terminal access. Transmits data in clear text, insecure. Largely replaced by SSH.
+* **SSH (Secure Shell):** Application layer protocol (Port 22) for secure remote login, command execution, and other secure network services over an unsecured network. Encrypts traffic.
+* **RDP (Remote Desktop Protocol):** Proprietary protocol by Microsoft (Port 3389) providing a user with a graphical interface to connect to another computer over a network connection.
+* **VNC (Virtual Network Computing):** Platform-independent remote desktop sharing system.
+* **DNS (Domain Name System):** Application layer protocol (Port 53 TCP/UDP) that translates human-readable domain names (e.g., www.google.com) into machine-readable IP addresses, and vice versa.
+  * **DNS Record Types:**
+    * **A Record (Address):** Maps a hostname to an IPv4 address.
+    * **AAAA Record (Quad A):** Maps a hostname to an IPv6 address.
+    * **CNAME (Canonical Name):** Alias of one name to another. The DNS lookup will continue by retrying the lookup with the new name.
+    * **MX (Mail Exchange):** Specifies mail servers responsible for accepting email messages on behalf of a domain.
+    * **NS (Name Server):** Delegates a DNS zone to use the given authoritative name servers.
+    * **PTR (Pointer):** Maps an IP address to a hostname (reverse DNS lookup).
+    * **SOA (Start of Authority):** Contains administrative information about a DNS zone, including the primary name server, email of the domain administrator, domain serial number, and timers.
+    * **SRV (Service):** Specifies the location (hostname and port number) of servers for specified services (e.g., LDAP, SIP).
+    * **TXT (Text):** Allows an administrator to insert arbitrary text into a DNS record. Used for SPF, DKIM, DMARC records for email validation.
+  * **DNS Hierarchy:** Root Servers -> TLD (Top-Level Domain) Servers -> Authoritative Name Servers.
+  * **Internal DNS:** DNS servers used within an organization's private network.
+  * **External DNS (Public DNS):** DNS servers accessible on the internet.
+  * **Recursive DNS Query:** DNS resolver queries other DNS servers on behalf of the client until it gets the answer.
+  * **Iterative DNS Query:** DNS resolver is referred to other DNS servers, and the resolver itself makes subsequent queries.
+  * **Zone Transfer (AXFR/IXFR):** Process of replicating DNS database contents from a primary to a secondary DNS server. AXFR is a full transfer, IXFR is incremental.
+  * **DNS Caching:** Storing DNS lookup results locally to speed up future requests for the same domain.
+  * **Time To Live (TTL):** A value in a DNS record that specifies how long a resolver should cache the DNS query before it expires and a new one must be done.
+* **DHCP (Dynamic Host Configuration Protocol):** Application layer protocol (Ports 67 UDP for server, 68 UDP for client) that dynamically assigns IP addresses and other network configuration parameters (subnet mask, default gateway, DNS servers) to devices on a network.
+  * **DORA Process:** Discover (client broadcast), Offer (server unicast/broadcast), Request (client broadcast), Acknowledge (server unicast/broadcast).
+  * **DHCP Scope:** A range of IP addresses a DHCP server can assign.
+  * **DHCP Exclusion Range:** IP addresses within a scope that are excluded from dynamic assignment.
+  * **DHCP Reservation:** Assigns a specific IP address to a specific MAC address permanently.
+  * **DHCP Lease Time:** The duration for which an assigned IP address is valid.
+  * **DHCP Relay Agent (IP Helper):** A router or host that forwards DHCP requests from clients on one subnet to a DHCP server on another subnet.
+* **NTP (Network Time Protocol):** Application layer protocol (Port 123 UDP) for clock synchronization between computer systems over packet-switched, variable-latency data networks.
+  * **Stratum:** Hierarchical levels of NTP servers. Stratum 0 are high-precision time sources (atomic clocks). Stratum 1 servers sync directly to Stratum 0, Stratum 2 to Stratum 1, and so on.
+* **SNMP (Simple Network Management Protocol):** Application layer protocol (Ports 161 UDP for agent, 162 UDP for manager traps) for collecting and organizing information about managed devices on IP networks and for modifying that information to change device behavior.
+  * **Manager (NMS - Network Management Station):** Software that queries agents.
+  * **Agent:** Software running on managed devices (routers, switches, servers).
+  * **MIB (Management Information Base):** A database of objects that can be managed on a device.
+  * **OID (Object Identifier):** Uniquely identifies managed objects in an MIB hierarchy.
+  * **Get, Set, Trap:** SNMP operations. (Get: query for value. Set: change value. Trap: unsolicited message from agent to manager for significant events).
+* **SIP (Session Initiation Protocol):** Application layer signaling protocol (Port 5060/5061 TCP/UDP) used for initiating, maintaining, modifying, and terminating real-time sessions that include voice, video, and messaging applications (e.g., VoIP).
+* **RTP (Real-time Transport Protocol):** Network protocol for delivering audio and video over IP networks. Typically runs over UDP.
+* **SRTP (Secure Real-time Transport Protocol):** A secure version of RTP that provides encryption, message authentication and integrity, and replay protection.
+* **VoIP (Voice over Internet Protocol):** A methodology and group of technologies for the delivery of voice communications and multimedia sessions over IP networks, such as the Internet.
+* **LDAP (Lightweight Directory Access Protocol):** Application layer protocol (Port 389 TCP/UDP) for accessing and maintaining distributed directory information services (e.g., Microsoft Active Directory).
+* **LDAPS (LDAP Secure):** LDAP over SSL/TLS (Port 636).
+* **Kerberos:** Network authentication protocol (Port 88 TCP/UDP) that uses secret-key cryptography to authenticate client-server applications. Provides strong authentication for users and services. Components: KDC (Key Distribution Center), AS (Authentication Server), TGS (Ticket-Granting Server).
+* **RADIUS (Remote Authentication Dial-In User Service):** Networking protocol (Ports 1812/1813 UDP or 1645/1646 UDP) that provides centralized Authentication, Authorization, and Accounting (AAA) management for users who connect and use a network service.
+* **TACACS+ (Terminal Access Controller Access-Control System Plus):** Cisco proprietary AAA protocol (Port 49 TCP). Separates AAA functions, encrypts entire packet payload.
+* **NetBIOS (Network Basic Input/Output System):** API providing services related to the session layer of the OSI model allowing applications on separate computers to communicate over a LAN. (Ports 137, 138, 139 UDP/TCP). Older technology.
+* **SMB (Server Message Block) / CIFS (Common Internet File System):** Application layer protocol (Port 445 TCP) for providing shared access to files, printers, and serial ports between nodes on a network.
+* **Syslog:** A standard for message logging. Allows separation of the software that generates messages, the system that stores them, and the software that reports and analyzes them. (Port 514 UDP/TCP).
+* **NetFlow/sFlow/IPFIX (IP Flow Information Export):** Protocols for collecting IP traffic information as it enters or exits an interface. Used for network monitoring, traffic analysis, and security.
+* **ARP (Address Resolution Protocol):** Layer 2/3 protocol used to map an IP address to a physical machine address (MAC address) that is recognized in the local network.
+* **RARP (Reverse Address Resolution Protocol):** Obsolete protocol used by a client machine to request its IPv4 address from a computer network when it knows only its MAC address. (Replaced by BOOTP and DHCP).
+* **ICMP (Internet Control Message Protocol):** Network layer protocol used by network devices to send error messages (e.g., destination unreachable, TTL exceeded) and operational information (e.g., echo request/reply used by \`ping\`).
+* **IGMP (Internet Group Management Protocol):** Network layer protocol used by hosts and adjacent routers on IPv4 networks to establish multicast group memberships.
+* **PPP (Point-to-Point Protocol):** Data link layer protocol used to establish a direct connection between two nodes. Common for dial-up, DSL, and VPNs.
+* **PPPoE (Point-to-Point Protocol over Ethernet):** Network protocol for encapsulating PPP frames inside Ethernet frames. Commonly used by DSL providers.
+* **GRE (Generic Routing Encapsulation):** A tunneling protocol developed by Cisco Systems that can encapsulate a wide variety of network layer protocols inside virtual point-to-point links over an IP network.
+* **IPsec (Internet Protocol Security):** A suite of protocols for securing IP communications by authenticating and/or encrypting each IP packet in a data stream.
+  * **AH (Authentication Header):** Provides connectionless integrity, data origin authentication, and protection against replays. Does not provide confidentiality (encryption).
+  * **ESP (Encapsulating Security Payload):** Provides confidentiality (encryption), and optionally connectionless integrity, data origin authentication, and anti-replay service.
+  * **IKE (Internet Key Exchange):** Protocol used to set up a Security Association (SA) in the IPsec protocol suite. (UDP Port 500).
+  * **SA (Security Association):** Establishes shared security attributes between two network entities to support secure communication.
+* **IEEE 802.1X:** An IEEE standard for port-based Network Access Control (PNAC). Provides an authentication mechanism to devices wishing to attach to a LAN or WLAN.
+* **EAP (Extensible Authentication Protocol):** An authentication framework frequently used in wireless networks and point-to-point connections. It defines message formats but not the specific authentication method.
+  * **PEAP (Protected EAP):** Encapsulates EAP within a TLS tunnel.
+  * **EAP-FAST (EAP Flexible Authentication via Secure Tunneling):** Cisco proprietary, similar to PEAP.
+  * **EAP-TLS (EAP Transport Layer Security):** Uses digital certificates for mutual authentication.
+  * **EAP-TTLS (EAP Tunneled TLS):** Similar to PEAP, but more flexible with inner authentication methods.
+
+## 9. IP Addressing & Subnetting
+
+* **IP Address (Internet Protocol Address):** A unique numerical label assigned to each device connected to a computer network that uses the Internet Protocol for communication.
+  * **IPv4 (Internet Protocol version 4):** The fourth version of the Internet Protocol. It uses a 32-bit address scheme allowing for 2^32 addresses (approximately 4.3 billion). Represented in dotted-decimal notation (e.g., 192.168.1.1).
+  * **IPv6 (Internet Protocol version 6):** The most recent version of the Internet Protocol. It uses a 128-bit address scheme, allowing for 2^128 addresses. Represented in hexadecimal notation with colons (e.g., 2001:0db8:85a3:0000:0000:8a2e:0370:7334).
+* **MAC Address (Media Access Control Address):** A unique 48-bit hardware identifier assigned to a NIC. Represented as 12 hexadecimal digits, often grouped in pairs separated by colons or hyphens (e.g., 00:1A:2B:3C:4D:5E).
+* **Subnet Mask (Netmask):** A 32-bit (for IPv4) or 128-bit (for IPv6 prefix) number that masks an IP address and divides the IP address into network address and host address.
+* **Subnetting:** The process of dividing a single large network into multiple smaller, more manageable sub-networks or subnets. Improves organization, security, and performance.
+* **VLSM (Variable-Length Subnet Masking):** Allows subnets of different sizes to be created from a single network address, optimizing IP address usage.
+* **CIDR (Classless Inter-Domain Routing):** A method for allocating IP addresses and IP routing that discards the old classful network distinctions (Class A, B, C). Uses a slash notation to indicate the number of network bits (prefix length), e.g., 192.168.1.0/24 means the first 24 bits are the network portion.
+* **Classful Addressing (Legacy):**
+  * **Class A:** 1.0.0.0 to 126.255.255.255 (/8 default mask 255.0.0.0)
+  * **Class B:** 128.0.0.0 to 191.255.255.255 (/16 default mask 255.255.0.0)
+  * **Class C:** 192.0.0.0 to 223.255.255.255 (/24 default mask 255.255.255.0)
+  * **Class D (Multicast):** 224.0.0.0 to 239.255.255.255
+  * **Class E (Experimental):** 240.0.0.0 to 255.255.255.255
+* **NAT (Network Address Translation):** A method of remapping one IP address space into another by modifying network address information in IP packet headers. Commonly used to allow multiple devices on a private network to share a single public IP address.
+  * **Static NAT (SNAT):** One-to-one mapping of a private IP to a public IP.
+  * **Dynamic NAT:** Maps private IPs to a pool of public IPs.
+* **PAT (Port Address Translation) / NAT Overload:** An extension of NAT that maps multiple private IP addresses to a single public IP address by using different source port numbers. Most common form of NAT.
+* **DNAT (Destination NAT) / Port Forwarding:** Changes the destination IP address and/or port of incoming packets. Used to make internal services accessible from the internet.
+* **Public IP Address:** An IP address that is routable on the internet and globally unique. Assigned by IANA/RIRs.
+* **Private IP Address (RFC1918):** IP addresses used within private networks that are not routable on the internet. Ranges:
+  * 10.0.0.0 to 10.255.255.255 (10.0.0.0/8)
+  * 172.16.0.0 to 172.31.255.255 (172.16.0.0/12)
+  * 192.168.0.0 to 192.168.255.255 (192.168.0.0/16)
+* **Static IP Address:** An IP address that is manually configured for a device and does not change.
+* **Dynamic IP Address:** An IP address that is automatically assigned to a device (usually by a DHCP server) and can change over time.
+* **APIPA (Automatic Private IP Addressing):** A feature in operating systems (primarily Windows) that enables DHCP clients to automatically self-configure an IP address and subnet mask when a DHCP server isn't available. APIPA addresses are in the range 169.254.0.1 to 169.254.255.254 with a /16 mask (169.254.0.0/16). These are link-local addresses and are not routable.
+* **Link-Local Address:**
+  * **IPv4:** APIPA addresses (169.254.0.0/16).
+  * **IPv6:** FE80::/10 prefix. Automatically configured on all IPv6 interfaces, used for communication on the local link only.
+* **Loopback Address:** An address used to send traffic back to the same device for testing purposes.
+  * **IPv4:** 127.0.0.0/8 range (commonly 127.0.0.1).
+  * **IPv6:** ::1.
+* **Default Gateway:** A router on a local network that devices send traffic to when the destination is on a different network.
+* **Virtual IP (VIP):** An IP address that doesn't correspond directly to a physical network interface. Used in failover clustering, load balancing (e.g., by FHRPs).
+* **Subinterface:** A logical interface created on a physical interface. Allows a single physical interface to have multiple logical configurations, often used for VLAN routing ("router-on-a-stick") or different IP addresses.
+* **EUI-64 (Extended Unique Identifier 64):** A method for automatically generating the 64-bit interface ID portion of an IPv6 address from a 48-bit MAC address. Involves inserting FFFE in the middle of the MAC and flipping the 7th bit (U/L bit).
+* **IPv6 Address Types:**
+  * **Unicast:** Identifies a single interface.
+    * **Global Unicast Address (GUA):** Routable on the internet, similar to public IPv4 addresses. Typically starts with 2000::/3.
+    * **Link-Local Address:** (FE80::/10) Used for communication on the local network segment only. Not routable.
+    * **Unique Local Address (ULA):** (FC00::/7 or FD00::/8) Similar to private IPv4 addresses, meant for use within a site or organization, not globally routable by default but intended to be globally unique.
+  * **Multicast:** (FF00::/8) Identifies a group of interfaces. Packets are delivered to all interfaces in the group.
+  * **Anycast:** Identifies a group of interfaces, but packets are delivered to only one (usually the nearest) interface in the group.
+* **SLAAC (Stateless Address Autoconfiguration):** A method allowing IPv6 hosts to automatically configure their own IP addresses using Router Advertisements (RAs) from a local router and often EUI-64.
+* **Router Advertisement (RA):** ICMPv6 messages sent by routers to announce their presence, prefixes, and other configuration parameters to IPv6 hosts on the link.
+* **Neighbor Discovery Protocol (NDP):** IPv6 protocol responsible for address autoconfiguration, duplicate address detection, router discovery, and address resolution (replaces ARP in IPv4). Uses ICMPv6 messages.
+* **Dual Stack:** Running both IPv4 and IPv6 protocol stacks on a network device or host, allowing communication over either protocol.
+* **Tunneling (IPv6):** Encapsulating IPv6 packets within IPv4 packets (or vice-versa) to traverse networks that don't support the native protocol (e.g., 6to4, Teredo, ISATAP).
+
+## 10. Routing Concepts
+
+* **Routing:** The process of selecting paths in a network along which to send network traffic.
+* **Router:** (See Network Hardware)
+* **Routing Table:** A data table stored in a router or networked computer that lists the routes to particular network destinations, and in some cases, metrics (distances) associated with those routes.
+* **Route:** A path between a source and a destination on a network.
+* **Metric (Routing Metric):** A value used by routing algorithms to determine the best path to a destination. Common metrics include hop count, bandwidth, delay, load, reliability, cost.
+* **Administrative Distance (AD):** A value from 0 to 255 that indicates the trustworthiness of a routing information source. Lower values are preferred. Used when a router learns about the same destination from multiple routing protocols.
+* **Next Hop:** The IP address of the next router that a packet must be sent to on its way to the destination.
+* **Static Routing:** Routes are manually configured by a network administrator. Simple, secure, but not scalable or fault-tolerant.
+* **Dynamic Routing:** Routers automatically learn routes from other routers using routing protocols. Scalable and adapts to network changes.
+* **Routing Protocols:**
+  * **Interior Gateway Protocol (IGP):** Used for routing within an Autonomous System (AS).
+    * **RIP (Routing Information Protocol):** Distance-vector protocol, uses hop count as metric. Older, slower convergence, limited to 15 hops. (RIPv1 is classful, RIPv2 is classless).
+    * **EIGRP (Enhanced Interior Gateway Routing Protocol):** Cisco proprietary advanced distance-vector (or hybrid) protocol. Uses DUAL algorithm, fast convergence, supports VLSM and CIDR. Metrics: bandwidth, delay, load, reliability. AD: 90 (internal), 170 (external).
+    * **OSPF (Open Shortest Path First):** Link-state protocol, uses Dijkstra's algorithm (Shortest Path First - SPF). Hierarchical design with areas. Metric: cost (based on bandwidth). AD: 110.
+    * **IS-IS (Intermediate System to Intermediate System):** Link-state protocol, similar to OSPF but less common in enterprise networks. Often used by ISPs.
+  * **Exterior Gateway Protocol (EGP):** Used for routing between different Autonomous Systems.
+    * **BGP (Border Gateway Protocol):** Path-vector protocol, the core routing protocol of the internet. Uses path attributes (AS-Path, NEXT_HOP, etc.) to make complex routing decisions. AD: 20 (eBGP), 200 (iBGP).
+* **Distance-Vector Protocol:** Routers advertise their routing tables to their direct neighbors. Prone to routing loops and slow convergence ("routing by rumor"). (e.g., RIP, IGRP - older Cisco).
+* **Link-State Protocol:** Routers build a complete map (topology database) of the network by exchanging link-state advertisements (LSAs) with all other routers in the same area. Faster convergence, less prone to loops. (e.g., OSPF, IS-IS).
+* **Path-Vector Protocol:** Routers advertise entire paths to destinations (sequences of AS numbers). Used by BGP to prevent loops in inter-AS routing.
+* **Convergence:** The process by which all routers in a network agree on the current network topology and update their routing tables accordingly after a change.
+* **Routing Loop:** A condition where packets are continuously routed between a set of routers without reaching their destination.
+* **Split Horizon:** A distance-vector routing rule that prevents a router from advertising a route back onto the interface from which it was learned. Helps prevent routing loops.
+* **Route Poisoning / Poison Reverse:** Techniques used by distance-vector protocols to mark a failed route as unreachable (e.g., with an infinite metric) and advertise it back to prevent other routers from using it.
+* **Hold-down Timer:** After a route is marked as down, a router starts a hold-down timer. During this time, the router ignores any updates about that route that indicate it is better than the previously known state, preventing flapping routes.
+* **Default Route (Gateway of Last Resort):** A route that is used when no specific route to a destination is found in the routing table (e.g., 0.0.0.0/0).
+* **Floating Static Route:** A static route with a higher administrative distance than a dynamically learned route. It acts as a backup route if the primary (dynamic) route fails.
+* **Policy-Based Routing (PBR):** Allows routers to make forwarding decisions based on criteria other than just the destination IP address (e.g., source IP, port number, protocol type).
+* **FHRP (First Hop Redundancy Protocol):** Provides redundant default gateway services to hosts on a subnet by allowing multiple routers to share a virtual IP and MAC address.
+  * **HSRP (Hot Standby Router Protocol):** Cisco proprietary. One active router, one standby.
+  * **VRRP (Virtual Router Redundancy Protocol):** IETF standard, similar to HSRP. One master router, one or more backup routers.
+  * **GLBP (Gateway Load Balancing Protocol):** Cisco proprietary. Allows load balancing across multiple gateway routers in addition to redundancy.
+* **Autonomous System (AS):** A collection of IP networks and routers under the control of one entity (or administrative domain) that presents a common routing policy to the internet.
+* **ASN (Autonomous System Number):** A globally unique identifier for an AS.
+
+## 11. Advanced Switching Concepts
+
+* **VLAN (Virtual Local Area Network):** (See Network Types)
+  * **Native VLAN:** The VLAN on an 802.1Q trunk port that carries untagged traffic. Both ends of the trunk must agree on the native VLAN.
+  * **Voice VLAN:** A separate VLAN configured on a switch port to carry voice traffic from an IP phone. Prioritizes voice traffic.
+  * **VLAN Tagging (IEEE 802.1Q):** A standard that adds a 4-byte tag to an Ethernet frame to identify the VLAN it belongs to. Used for trunk links carrying traffic for multiple VLANs.
+  * **Trunk Port (Trunk Link):** A switch port configured to carry traffic for multiple VLANs between switches or between a switch and a router.
+  * **Access Port:** A switch port that belongs to only one VLAN and carries traffic for that VLAN only (typically untagged).
+  * **SVI (Switched Virtual Interface):** A logical Layer 3 interface on a switch associated with a specific VLAN. Allows for inter-VLAN routing on a multilayer switch.
+  * **VTP (VLAN Trunking Protocol):** Cisco proprietary protocol for propagating VLAN information across a switched network. (Less used now, manual configuration often preferred for security).
+* **Spanning Tree Protocol (STP - IEEE 802.1D):** A Layer 2 protocol that prevents switching loops in networks with redundant paths by logically blocking some ports to create a loop-free tree topology.
+  * **Root Bridge:** The central switch in an STP topology, all paths are calculated from it. Elected based on lowest Bridge ID (Priority + MAC address).
+  * **BPDU (Bridge Protocol Data Unit):** Frames used by STP to exchange information between switches.
+  * **Port States (STP):** Blocking, Listening, Learning, Forwarding, Disabled.
+  * **RSTP (Rapid Spanning Tree Protocol - IEEE 802.1w):** Faster convergence than STP. Port roles: Root, Designated, Alternate, Backup.
+  * **MSTP (Multiple Spanning Tree Protocol - IEEE 802.1s):** Allows multiple STP instances for different groups of VLANs, improving load balancing and resource utilization.
+  * **PortFast (Cisco):** Enables a switch port to transition directly to the forwarding state, bypassing the listening and learning states. Used on ports connected to end devices (hosts), not other switches.
+  * **BPDU Guard:** Disables a PortFast-enabled port if it receives a BPDU, preventing accidental loops.
+  * **Root Guard:** Prevents a switch port from becoming an STP root port, protecting the desired root bridge placement.
+* **Link Aggregation (EtherChannel / Port Channeling / Bonding - IEEE 802.3ad/802.1AX):** Combines multiple physical Ethernet links into a single logical link to increase bandwidth and provide redundancy.
+  * **LACP (Link Aggregation Control Protocol):** An IEEE standard protocol for dynamically negotiating and forming aggregated links.
+  * **PAgP (Port Aggregation Protocol):** Cisco proprietary protocol for EtherChannel negotiation.
+* **PoE (Power over Ethernet - IEEE 802.3af):** Delivers electrical power along with data over twisted pair Ethernet cabling to devices like WAPs, IP phones, and cameras. Max 15.4W per port.
+* **PoE+ (Power over Ethernet Plus - IEEE 802.3at):** Higher power version of PoE. Max 30W per port (25.5W at device).
+* **PoE++ / UPoE (Universal PoE - IEEE 802.3bt):** Even higher power. Type 3 (60W per port), Type 4 (100W per port).
+* **MAC Address Table (CAM Table - Content Addressable Memory):** A table on a switch that stores MAC addresses and the switch ports they are associated with. Used to make forwarding decisions.
+* **Port Mirroring (SPAN - Switched Port Analyzer):** Copies traffic from one or more switch ports (source ports) to a specific destination port, often for monitoring or troubleshooting with a packet sniffer.
+* **Port Security:** A switch feature that restricts input to an interface by limiting the MAC addresses allowed to send traffic on that port. Can specify actions for violations (e.g., shutdown, restrict, protect).
+* **Jumbo Frames:** Ethernet frames with a payload larger than the standard 1500 bytes (e.g., 9000 bytes). Can improve throughput in SANs and high-performance networks by reducing overhead, but all devices in the path must support them.
+* **MTU (Maximum Transmission Unit):** The largest size packet or frame, specified in octets (bytes), that can be sent in a packet- or frame-based network such as the internet. Ethernet default is 1500 bytes.
+* **Flow Control (IEEE 802.3x):** A mechanism to temporarily stop the transmission of data on Ethernet networks. Helps prevent buffer overflows on switches.
+
+## 12. Wireless Networking In-Depth
+
+* **Wi-Fi (Wireless Fidelity):** Family of wireless network protocols based on IEEE 802.11 standards.
+* **IEEE 802.11 Standards:**
+  * **802.11a:** 5 GHz, up to 54 Mbps.
+  * **802.11b:** 2.4 GHz, up to 11 Mbps.
+  * **802.11g:** 2.4 GHz, up to 54 Mbps. Backward compatible with 802.11b.
+  * **802.11n (Wi-Fi 4):** 2.4 GHz and/or 5 GHz, up to 600 Mbps (with MIMO and channel bonding).
+  * **802.11ac (Wi-Fi 5):** 5 GHz only, up to multi-Gbps (with MU-MIMO, more spatial streams, wider channels).
+  * **802.11ax (Wi-Fi 6 / Wi-Fi 6E):** 2.4 GHz, 5 GHz, and 6 GHz (for 6E). Improved efficiency, capacity, and performance in dense environments. Uses OFDMA, MU-MIMO (uplink & downlink), BSS Coloring, TWT.
+* **Frequency Bands:**
+  * **2.4 GHz:** Longer range, better penetration through obstacles, but more interference (microwaves, Bluetooth) and fewer non-overlapping channels (typically 1, 6, 11 in North America).
+  * **5 GHz:** Shorter range, less penetration, but less interference and more non-overlapping channels.
+  * **6 GHz:** (Wi-Fi 6E) Even more channels, very low interference, but shortest range/penetration.
+* **Channels & Channel Width:**
+  * **Channel:** A specific frequency range within a band used for communication.
+  * **Channel Width:** The bandwidth of a single channel (e.g., 20 MHz, 40 MHz, 80 MHz, 160 MHz). Wider channels offer higher throughput but can increase interference.
+  * **Channel Bonding:** Combining adjacent channels to create a wider channel for increased bandwidth.
+  * **Non-overlapping Channels:** Channels that do not interfere with each other (e.g., 1, 6, 11 in 2.4 GHz).
+* **Antenna Types:**
+  * **Omnidirectional Antenna:** Radiates power uniformly in all directions in one plane.
+  * **Directional Antenna (Unidirectional):** Focuses radio energy in a specific direction.
+    * **Yagi Antenna:** Directional, high gain.
+    * **Parabolic Antenna (Dish):** Highly directional, very high gain, for long-distance links.
+    * **Patch Antenna:** Flat, panel-like, can be omni or directional.
+* **MIMO (Multiple Input, Multiple Output):** Uses multiple antennas on both the transmitter and receiver to improve communication performance (throughput and range) by leveraging multipath propagation.
+* **MU-MIMO (Multi-User MIMO):** Allows an access point to communicate with multiple client devices simultaneously using different spatial streams.
+* **Beamforming:** A signal processing technique used to direct radio signals towards a specific client device, improving signal strength and throughput.
+* **SSID (Service Set Identifier):** The name of a wireless network. Broadcast by WAPs.
+* **BSS (Basic Service Set):** A WAP and the client devices associated with it.
+* **BSSID (Basic Service Set Identifier):** The MAC address of the WAP's radio.
+* **ESS (Extended Service Set):** Two or more BSSs connected by a distribution system (typically a wired network), allowing clients to roam between WAPs while maintaining connectivity. Uses the same SSID.
+* **ESSID (Extended Service Set Identifier):** The SSID used in an ESS.
+* **IBSS (Independent Basic Service Set) / Ad Hoc Mode:** A wireless network where client devices communicate directly with each other without a WAP.
+* **Wireless Modes:**
+  * **Infrastructure Mode:** Clients connect to a WAP, which then connects to the wired network. Most common mode.
+  * **Ad Hoc Mode (IBSS):** (See above)
+  * **Mesh Mode:** WAPs connect to each other wirelessly to form a self-healing network, extending coverage.
+* **Wireless Security Protocols:**
+  * **WEP (Wired Equivalent Privacy):** Obsolete, very insecure due to cryptographic weaknesses.
+  * **WPA (Wi-Fi Protected Access):** Improvement over WEP, used TKIP for encryption. Also considered insecure now.
+  * **WPA2 (Wi-Fi Protected Access 2):** Uses AES encryption (with CCMP) for strong security. Industry standard for many years.
+  * **WPA3 (Wi-Fi Protected Access 3):** Latest standard, enhances security with features like Simultaneous Authentication of Equals (SAE) for stronger protection against password guessing, and improved encryption for open networks (Wi-Fi Enhanced Open).
+* **Encryption Methods:**
+  * **TKIP (Temporal Key Integrity Protocol):** Used by WPA. Deprecated.
+  * **AES (Advanced Encryption Standard):** Strong encryption algorithm used by WPA2 and WPA3.
+  * **CCMP (Counter Mode Cipher Block Chaining Message Authentication Code Protocol):** AES-based encryption protocol used with WPA2/WPA3.
+* **Authentication Methods:**
+  * **PSK (Pre-Shared Key) / WPA-Personal:** Uses a shared password for authentication. Common in home networks.
+  * **Enterprise Mode / WPA-Enterprise / IEEE 802.1X:** Uses a RADIUS server (or other AAA server) for centralized authentication of users, often with individual credentials or certificates. More secure and manageable for organizations.
+* **WPS (Wi-Fi Protected Setup):** A standard to simplify the setup of wireless networks (e.g., using a PIN or push-button). Has known security vulnerabilities and is often recommended to be disabled.
+* **MAC Filtering:** Restricting network access based on the MAC addresses of client devices. Can be easily bypassed and offers limited security.
+* **Captive Portal:** A web page that a user must interact with (e.g., enter credentials, accept terms) before being granted access to a network, often used in public Wi-Fi hotspots.
+* **Geofencing:** Creating a virtual geographic boundary, enabling software to trigger a response when a mobile device enters or leaves a particular area. Can be used for location-based access control.
+* **Wireless Site Survey:** The process of planning and designing a wireless network to provide sufficient coverage, capacity, and performance. Involves identifying WAP locations, channel assignments, and potential interference sources.
+* **Heat Map:** A visual representation of wireless signal strength and coverage in an area, generated during or after a site survey.
+* **CSMA/CA (Carrier Sense Multiple Access with Collision Avoidance):** The media access control method used by Wi-Fi. Devices listen before transmitting and use mechanisms to avoid collisions (as collisions are harder to detect in wireless).
+* **RTS/CTS (Request to Send / Clear to Send):** An optional mechanism in 802.11 to reduce collisions, especially in situations with hidden nodes.
+* **Band Steering:** Encourages dual-band client devices to connect to the less congested 5 GHz band instead of the 2.4 GHz band.
+* **AP Isolation (Client Isolation):** Prevents wireless clients connected to the same AP from communicating directly with each other. Enhances security in guest networks.
+* **OFDMA (Orthogonal Frequency Division Multiple Access):** Used in Wi-Fi 6 (802.11ax) to divide a wireless channel into smaller sub-channels (Resource Units - RUs), allowing an AP to communicate with multiple clients simultaneously, improving efficiency, especially for small packets.
+* **TWT (Target Wake Time):** A Wi-Fi 6 feature that allows devices to negotiate when and how often they will wake up to send or receive data, improving battery life for IoT devices.
+* **BSS Coloring:** A Wi-Fi 6 feature that adds a "color" identifier to transmissions to help devices differentiate between BSSs, reducing interference in dense environments.
+* **Cellular Technologies:**
+  * **GSM (Global System for Mobile Communications)**
+  * **CDMA (Code Division Multiple Access)**
+  * **LTE (Long-Term Evolution) / 4G**
+  * **5G**
+  * **NFC (Near Field Communication):** Very short-range wireless for payments, pairing.
+  * **RFID (Radio-Frequency Identification):** Uses radio waves to identify and track tags attached to objects.
+  * **Zigbee / Z-Wave:** Low-power, low-data-rate wireless protocols for IoT and home automation.
+  * **LoRaWAN (Long Range Wide Area Network):** Low-power, long-range wireless protocol for IoT.
+
+## 13. Network Management and Monitoring
+
+* **Network Documentation:** Essential for understanding, managing, and troubleshooting a network.
+  * **Physical Network Diagram:** Shows the actual layout of devices and cabling.
+  * **Logical Network Diagram:** Shows how data flows, including IP addressing, subnets, routing, and VLANs.
+  * **Wiring Diagram:** Details cable runs, patch panel connections, and port assignments.
+  * **Rack Diagram:** Shows the layout of equipment in server racks.
+  * **Asset Management:** Tracking network hardware and software inventory, including purchase dates, warranties, and configurations.
+  * **IP Schema / IP Address Management (IPAM):** Documenting and managing IP address allocation, subnets, and DHCP scopes. IPAM tools can automate this.
+  * **Standard Operating Procedures (SOPs) / Work Instructions:** Documented procedures for common network tasks and incident response.
+  * **Change Management:** A formal process for making changes to the network to minimize risk and disruption.
+* **Network Monitoring:** Observing network traffic and device status to identify issues, optimize performance, and ensure security.
+  * **Baseline:** A snapshot of normal network performance metrics, used for comparison to identify anomalies.
+  * **Alarms/Alerts/Notifications:** Automated messages triggered by specific network events or threshold breaches.
+  * **Logs:** Records of network events, device activity, and errors.
+    * **Event Logs:** General system events.
+    * **Security Logs:** Security-related events (logins, access attempts, firewall activity).
+    * **Audit Logs:** Records of actions performed by users or administrators.
+* **Network Monitoring Tools & Protocols:**
+  * **SNMP (Simple Network Management Protocol):** (See Network Protocols)
+  * **Syslog:** (See Network Protocols)
+  * **SIEM (Security Information and Event Management):** Collects, analyzes, and correlates log data from various sources to detect security threats and provide real-time alerts.
+  * **Packet Sniffer / Protocol Analyzer (e.g., Wireshark):** Captures and analyzes network traffic at the packet level.
+  * **Port Scanner (e.g., Nmap):** Probes a host or network to identify open ports and running services.
+  * **NetFlow / sFlow / J-Flow / IPFIX:** Technologies for collecting IP traffic flow information from routers and switches. Provides insights into traffic patterns, bandwidth usage, and application activity.
+  * **TFTP Server (Trivial File Transfer Protocol Server):** Used for backing up and restoring configuration files for network devices.
+* **Performance Metrics:**
+  * **Bandwidth Utilization:** The percentage of available bandwidth being used.
+  * **Error Rate:** The frequency of errors in data transmission (e.g., CRC errors, collisions).
+  * **Packet Loss:** The percentage of packets that fail to reach their destination.
+  * **Uptime/Availability:** (See General Networking Concepts)
+* **Configuration Management:**
+  * **Configuration Backup/Restore:** Regularly backing up device configurations and having a plan to restore them.
+  * **Configuration Drift:** Unintended changes to a device's configuration over time, deviating from the baseline or standard.
+  * **Compliance:** Ensuring network configurations adhere to security policies, industry regulations, and best practices.
+
+## 14. Quality of Service (QoS)
+
+* **QoS (Quality of Service):** Mechanisms to manage network resources and prioritize certain types of traffic over others to ensure a desired level of performance, especially for sensitive applications like VoIP and video.
+* **QoS Mechanisms:**
+  * **Classification:** Identifying and categorizing different types of traffic (e.g., voice, video, web, email).
+  * **Marking:** Adding a value to packet headers to indicate their priority or class of service.
+    * **CoS (Class of Service - IEEE 802.1p):** A 3-bit field in the VLAN tag (Layer 2) used for marking priority.
+    * **DSCP (Differentiated Services Code Point):** A 6-bit field in the IP header (Layer 3) used for marking priority (part of DiffServ).
+  * **Congestion Management (Queuing):** Managing how packets are buffered and forwarded when a link is congested.
+    * **FIFO (First-In, First-Out):** Default, no prioritization.
+    * **PQ (Priority Queuing):** High-priority queues are always serviced first. Can starve low-priority queues.
+    * **CQ (Custom Queuing):** Allocates a specific amount of bandwidth to each queue.
+    * **WFQ (Weighted Fair Queuing):** Dynamically assigns weights to queues to ensure fair bandwidth distribution.
+    * **CBWFQ (Class-Based Weighted Fair Queuing):** Allows user-defined traffic classes with guaranteed bandwidth.
+    * **LLQ (Low Latency Queuing):** Combines CBWFQ with strict priority queuing for delay-sensitive traffic like voice.
+  * **Congestion Avoidance:** Mechanisms to proactively drop packets before queues become full, to signal TCP to slow down.
+    * **RED (Random Early Detection):** Randomly drops packets as congestion increases.
+    * **WRED (Weighted RED):** RED that can differentiate traffic priorities for dropping.
+  * **Traffic Shaping (Rate Limiting):** Controls the rate at which traffic is sent out an interface, typically by buffering excess packets. Smooths out traffic bursts.
+  * **Traffic Policing:** Monitors traffic rate and drops or re-marks packets that exceed the configured rate. Does not buffer.
+  * **Link Efficiency Mechanisms:**
+    * **Compression:** Reducing the size of packet headers or payloads.
+    * **LFI (Link Fragmentation and Interleaving):** Breaks large packets into smaller ones and interleaves them with smaller, delay-sensitive packets (like voice) to reduce jitter.
+
+## 15. Cloud and Virtualization In-Depth
+
+* **Cloud Computing:** (See General Networking Concepts)
+  * **On-Premises (On-Prem):** IT infrastructure hosted within an organization's own data center or facilities.
+  * **Off-Premises:** IT infrastructure hosted externally, typically by a cloud provider.
+* **Cloud Service Models:**
+  * **IaaS (Infrastructure as a Service):** Provides virtualized computing resources (VMs, storage, networks) over the internet. Customer manages OS, applications, data. (e.g., AWS EC2, Azure VMs, GCP Compute Engine).
+  * **PaaS (Platform as a Service):** Provides a platform for developing, running, and managing applications without the complexity of building and maintaining the infrastructure. Customer manages applications and data. (e.g., AWS Elastic Beanstalk, Heroku, Google App Engine).
+  * **SaaS (Software as a Service):** Provides ready-to-use software applications accessed over the internet, typically on a subscription basis. Provider manages all aspects. (e.g., Gmail, Salesforce, Microsoft 365).
+  * **XaaS (Anything as a Service):** A general term for any IT service delivered over the cloud.
+* **Cloud Deployment Models:**
+  * **Public Cloud:** Cloud services are owned and operated by a third-party provider and delivered over the public internet. Resources are shared among multiple customers (multi-tenant).
+  * **Private Cloud:** Cloud infrastructure is operated solely for a single organization. Can be managed internally or by a third party, and hosted on-prem or off-prem.
+  * **Hybrid Cloud:** Combines public and private clouds, allowing data and applications to be shared between them.
+  * **Community Cloud:** Cloud infrastructure is shared by several organizations with common concerns (e.g., security, compliance).
+  * **Multi-Cloud:** Using services from multiple public cloud providers.
+* **Virtualization:** (See General Networking Concepts)
+  * **Hypervisor (VMM - Virtual Machine Monitor):** Software, firmware, or hardware that creates and runs virtual machines.
+    * **Type 1 Hypervisor (Bare-Metal):** Runs directly on the host's hardware. (e.g., VMware ESXi, Microsoft Hyper-V, KVM).
+    * **Type 2 Hypervisor (Hosted):** Runs on top of a conventional operating system. (e.g., VMware Workstation, Oracle VirtualBox, Parallels Desktop).
+  * **VM (Virtual Machine):** An emulation of a physical computer system.
+  * **vNIC (Virtual Network Interface Card):** A virtualized network adapter for a VM, allowing it to connect to a virtual network.
+  * **vSwitch (Virtual Switch):** A software-based switch that operates at Layer 2 within a hypervisor, allowing VMs on the same host or different hosts to communicate, and connecting them to physical networks.
+  * **NFV (Network Function Virtualization):** Decouples network functions (like routing, firewalling, load balancing) from dedicated hardware appliances, allowing them to run as software on standard IT infrastructure (servers, storage, switches).
+* **Cloud Networking Concepts:**
+  * **VPC (Virtual Private Cloud):** A logically isolated section of a public cloud where you can launch resources in a virtual network that you define.
+  * **Cloud Gateway:**
+    * **Internet Gateway (IGW):** Enables communication between resources in a VPC and the internet.
+    * **NAT Gateway:** Allows instances in a private subnet of a VPC to connect to the internet or other AWS services, but prevents the internet from initiating connections with those instances.
+  * **Network Security Group (NSG) / Security Group (SG):** A virtual firewall for VMs that controls inbound and outbound traffic at the instance level. Stateful.
+  * **ACL (Access Control List) / Network ACL (NACL):** Controls traffic in and out of subnets within a VPC. Stateless.
+  * **Cloud Connectivity Options:**
+    * **VPN (Virtual Private Network):** Secure connection from on-premises to a VPC.
+    * **Direct Connect (AWS) / ExpressRoute (Azure) / Interconnect (GCP):** Dedicated private network connection from on-premises to the cloud provider's network.
+  * **Elasticity:** The ability of a system to automatically scale resources up or down based on demand.
+  * **Scalability (Cloud):** The ability to increase or decrease IT resources as needed to meet changing demand.
+  * **Orchestration:** Automated arrangement, coordination, and management of complex computer systems and services (e.g., deploying and managing VMs and applications in the cloud).
+  * **Automation:** Using scripts or tools to perform tasks without manual intervention.
+* **VXLAN (Virtual Extensible LAN):** A network virtualization technology that attempts to address the scalability problems associated with large cloud computing deployments. It uses a VLAN-like encapsulation technique to encapsulate OSI layer 2 Ethernet frames within layer 4 UDP packets, using a 24-bit VNI (VXLAN Network Identifier), which allows for up to 16 million logical networks.
+* **DCI (Data Center Interconnect):** Technologies used to connect two or more data centers together over short, medium, or long distances using high-speed data connections.
+
+## 16. Software-Defined Networking (SDN) and Emerging Technologies
+
+* **SDN (Software-Defined Networking):** A network architecture approach that enables the network to be intelligently and centrally controlled, or "programmed," using software applications. Decouples the control plane from the data plane.
+  * **Control Plane:** The part of the network that carries signaling traffic and is responsible for routing decisions and network intelligence.
+  * **Data Plane (Forwarding Plane):** The part of the network that carries user traffic and forwards it based on decisions made by the control plane.
+  * **Southbound API (SBAPI):** Interface between the SDN controller and the network devices (data plane). (e.g., OpenFlow, NETCONF).
+  * **Northbound API (NBAPI):** Interface between the SDN controller and applications or orchestration systems (control plane/application plane). (e.g., REST APIs).
+  * **SDN Controller:** The "brain" of the SDN network, managing flow control to the switches/routers 'below' (via southbound APIs) and to the applications and business logic 'above' (via northbound APIs).
+* **SD-WAN (Software-Defined Wide Area Network):** (See Network Types)
+  * **Application-Aware Routing:** SD-WAN can identify applications and route their traffic over the optimal WAN path based on policies and real-time link conditions.
+  * **Zero-Touch Provisioning (ZTP):** Allows new SD-WAN devices to be deployed and configured automatically without manual intervention at the remote site.
+  * **Transport Agnostic:** SD-WAN can use multiple types of WAN connections (MPLS, internet broadband, LTE) simultaneously.
+  * **Centralized Policy Management:** Network and security policies are configured and managed from a central controller.
+* **NFV (Network Function Virtualization):** (See Cloud and Virtualization)
+* **Infrastructure as Code (IaC):** Managing and provisioning IT infrastructure (networks, VMs, load balancers, etc.) through machine-readable definition files (code), rather than physical hardware configuration or interactive configuration tools. Enables automation and version control.
+  * **Playbooks/Templates (e.g., Ansible, Terraform, CloudFormation):** Define the desired state of the infrastructure.
+  * **Configuration Drift:** (See Network Management) IaC helps prevent this.
+* **Spine and Leaf Architecture:** (See Network Topologies)
+* **Zero Trust Architecture (ZTA):** A security model based on the principle of "never trust, always verify." Assumes no implicit trust is granted to assets or user accounts based solely on their physical or network location. Requires strict identity verification and granular access controls.
+  * **Microsegmentation:** Dividing a network into small, isolated segments to limit the lateral movement of threats.
+* **SASE (Secure Access Service Edge):** A cloud-native security framework that converges networking (SD-WAN) and security functions (e.g., FWaaS, SWG, CASB, ZTNA) into a single, integrated cloud service. Delivered from the cloud edge.
+* **SSE (Security Service Edge):** The security-focused subset of SASE, providing secure access to web, cloud services, and private applications.
+* **API (Application Programming Interface):** A set of rules and protocols that allows different software applications to communicate and exchange data with each other.
+  * **REST API (Representational State Transfer):** A common architectural style for designing networked applications, often using HTTP.
+* **IoT (Internet of Things):** A network of physical objects ("things") embedded with sensors, software, and other technologies for the purpose of connecting and exchanging data with other devices and systems over the internet.
+* **Edge Computing:** A distributed computing paradigm that brings computation and data storage closer to the sources of data – such as IoT devices or local edge servers. This is done to improve response times and save bandwidth.
+* **Fog Computing:** An extension of cloud computing that consists of multiple edge nodes directly connected to physical devices, providing computation, storage, and networking services between end devices and traditional cloud computing data centers.
+
+## 17. Network Security In-Depth
+
+* **CIA Triad:**
+  * **Confidentiality:** Ensuring that information is not disclosed to unauthorized individuals, entities, or processes. (Achieved via encryption, access controls).
+  * **Integrity:** Maintaining the consistency, accuracy, and trustworthiness of data over its entire lifecycle. (Achieved via hashing, digital signatures, version control).
+  * **Availability:** Ensuring that systems and data are accessible to authorized users when needed. (Achieved via redundancy, fault tolerance, disaster recovery).
+* **AAA (Authentication, Authorization, and Accounting):**
+  * **Authentication:** Verifying the identity of a user, device, or process. (Methods: Passwords, MFA, Biometrics, Certificates).
+  * **Authorization:** Granting or denying access to resources based on the authenticated identity and defined permissions.
+  * **Accounting (Auditing):** Tracking user activity and resource consumption.
+* **MFA (Multi-Factor Authentication):** Requires users to provide two or more verification factors to gain access. Factors: Something you know (password), something you have (token, smart card), something you are (biometric).
+* **SSO (Single Sign-On):** Allows users to log in once with a single set of credentials to access multiple applications and services.
+* **Federated Identity Management (FIM):** An arrangement that can be made among multiple enterprises that lets subscribers use the same identification data to obtain access to the networks of all enterprises in the group.
+* **PKI (Public Key Infrastructure):** A set of roles, policies, hardware, software, and procedures needed to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.
+  * **Digital Certificate (X.509 Certificate):** An electronic document that uses a digital signature to bind a public key with an identity.
+  * **CA (Certificate Authority):** An entity that issues digital certificates.
+  * **RA (Registration Authority):** Verifies user identities for the CA.
+  * **CRL (Certificate Revocation List):** A list of digital certificates that have been revoked by the issuing CA before their scheduled expiration date.
+  * **OCSP (Online Certificate Status Protocol):** An internet protocol used for obtaining the revocation status of an X.509 digital certificate in real-time.
+* **Encryption:** (See General Networking Concepts)
+  * **Symmetric Encryption:** Uses the same key for both encryption and decryption. (e.g., AES, DES, 3DES). Faster.
+  * **Asymmetric Encryption (Public-Key Cryptography):** Uses a pair of keys: a public key for encryption and a private key for decryption. (e.g., RSA, ECC). Slower, used for key exchange and digital signatures.
+  * **Hashing:** A one-way function that converts an input (or 'message') into a fixed-size string of bytes, known as a hash value or digest. Used for integrity checking. (e.g., MD5, SHA-1, SHA-256).
+  * **Digital Signature:** Provides authentication, non-repudiation, and integrity. Created by hashing data and then encrypting the hash with the sender's private key.
+* **Common Network Attacks & Threats:**
+  * **Malware:** (Virus, Worm, Trojan, Ransomware, Spyware, Adware, Rootkit, Keylogger).
+  * **Phishing / Spear Phishing / Whaling / Vishing / Smishing:** Deceptive attempts to acquire sensitive information.
+  * **DoS (Denial of Service) / DDoS (Distributed Denial of Service):** Overwhelming a target with traffic to make it unavailable.
+  * **Man-in-the-Middle (MitM) Attack:** Attacker secretly relays and possibly alters the communication between two parties.
+  * **ARP Poisoning (ARP Spoofing):** Sending falsified ARP messages to link an attacker's MAC address with the IP address of a legitimate host.
+  * **MAC Spoofing:** Changing a device's MAC address to impersonate another device.
+  * **IP Spoofing:** Creating IP packets with a forged source IP address to impersonate another system or hide the sender's identity.
+  * **DNS Poisoning (DNS Cache Poisoning / DNS Spoofing):** Corrupting DNS data to redirect users to malicious sites.
+  * **VLAN Hopping:** An attack method used to gain access to traffic on other VLANs that would normally not be accessible. (Switch spoofing, double tagging).
+  * **SQL Injection:** Injecting malicious SQL code into input fields to manipulate a backend database.
+  * **Cross-Site Scripting (XSS):** Injecting malicious scripts into trusted websites, which then execute in victims' browsers.
+  * **Buffer Overflow:** Writing data beyond the allocated buffer space, potentially overwriting adjacent memory and causing crashes or allowing code execution.
+  * **Zero-Day Attack/Exploit:** (See General Networking Concepts)
+  * **Insider Threat:** Malicious activity or security breach originating from within the organization.
+  * **Social Engineering:** Manipulating people into performing actions or divulging confidential information.
+  * **Tailgating/Piggybacking:** Following an authorized person into a restricted area.
+  * **Dumpster Diving:** Retrieving sensitive information from discarded materials.
+  * **Shoulder Surfing:** Observing someone's screen or keyboard to obtain sensitive information.
+* **Wireless-Specific Attacks:**
+  * **Rogue AP:** An unauthorized WAP connected to a network.
+  * **Evil Twin:** A fraudulent WAP that appears legitimate but is set up to eavesdrop on wireless communications.
+  * **War Driving / War Chalking:** Searching for Wi-Fi networks from a moving vehicle / using symbols to mark Wi-Fi availability.
+  * **Deauthentication/Disassociation Attack:** Sending spoofed frames to disconnect clients from a WAP.
+  * **WPS Attack:** Exploiting vulnerabilities in Wi-Fi Protected Setup.
+  * **Bluejacking:** Sending unsolicited messages over Bluetooth.
+  * **Bluesnarfing:** Unauthorized access to information from a wireless device through a Bluetooth connection.
+* **Network Hardening:** The process of securing a network by reducing its surface of vulnerability.
+  * Disabling unused ports and services.
+  * Changing default credentials.
+  * Keeping systems patched and updated.
+  * Using strong passwords and MFA.
+  * Implementing firewalls and IDS/IPS.
+  * Configuring port security.
+  * Using secure protocols (HTTPS, SSH, SFTP).
+* **Security Policies:**
+  * **Acceptable Use Policy (AUP):** Defines how users are permitted to use network and system resources.
+  * **Password Policy:** Rules for creating and managing strong passwords.
+  * **Remote Access Policy:** Governs how users can connect to the network remotely.
+  * **Data Sensitivity / Data Handling Policy:** Classifies data and defines procedures for handling sensitive information.
+* **NAC (Network Access Control - IEEE 802.1X):** A security approach that attempts to unify endpoint security technology (such as antivirus, host intrusion prevention, and vulnerability assessment), user or system authentication and network security enforcement. Can check device health before granting access.
+* **Security Zones:** Dividing a network into segments with different security levels.
+  * **DMZ (Demilitarized Zone):** A perimeter network that exposes an organization's external-facing services (e.g., web servers, mail servers) to an untrusted network like the internet, while isolating them from the internal trusted network.
+* **Honeypot / Honeynet:** A decoy system or network set up to attract and trap attackers, allowing their activities to be studied.
+* **Penetration Testing (Pen Test):** An authorized simulated cyberattack on a computer system, performed to evaluate the security of the system.
+* **Vulnerability Scanning:** The process of identifying security weaknesses in systems and networks.
+* **Threat Intelligence:** Organized, analyzed, and refined information about potential or current attacks that threaten an organization.
+
+## 18. Network Troubleshooting Tools and Methodologies
+
+* **Troubleshooting Methodology:**
+  1. **Identify the problem:** Gather information, question users, identify symptoms, determine scope.
+  2. **Establish a theory of probable cause:** Question the obvious, consider multiple approaches (top-down, bottom-up, divide and conquer OSI model).
+  3. **Test the theory to determine cause:** If theory is confirmed, determine next steps. If not, establish new theory or escalate.
+  4. **Establish a plan of action to resolve the problem and identify potential effects.**
+  5. **Implement the solution or escalate as necessary.**
+  6. **Verify full system functionality and, if applicable, implement preventive measures.**
+  7. **Document findings, actions, and outcomes.**
+* **Hardware Troubleshooting Tools:**
+  * **Cable Tester:** Verifies the electrical connectivity of network cables (checks for shorts, opens, crossed pairs, proper pinout).
+  * **Loopback Adapter (Loopback Plug):** Tests network interface ports by redirecting outgoing signals back into the port.
+  * **Punchdown Tool:** Used to terminate wires on punch-down blocks (66, 110) and patch panels.
+  * **Tone Generator and Probe (Fox and Hound):** Used to trace cables by sending a tone down a wire and using a probe to detect it at the other end or along the path.
+  * **Multimeter:** Measures electrical properties like voltage (AC/DC), current, and resistance. Can check cable continuity.
+  * **OTDR (Optical Time Domain Reflectometer):** Tests fiber optic cables. Can identify breaks, bends, splice losses, and measure cable length by sending light pulses and analyzing reflections.
+  * **Light Meter / Optical Power Meter (OPM):** Measures the power (signal strength) in an optical signal.
+  * **Cable Certifier:** Advanced tool that tests if a cable meets specific performance standards (e.g., Cat 6a specifications for bandwidth, crosstalk, attenuation).
+  * **Crimper:** Used to attach connectors (e.g., RJ45) to the ends of cables.
+  * **Wire Stripper:** Removes insulation from wires.
+* **Software Troubleshooting Tools (Command-Line):**
+  * **\`ping\`:** Sends ICMP echo requests to a target host to test basic connectivity and measure RTT.
+  * **\`ipconfig\` (Windows) / \`ifconfig\` (Linux/macOS - older) / \`ip addr\` (Linux - newer):** Displays IP configuration information for network interfaces (IP address, subnet mask, default gateway, MAC address).
+  * **\`tracert\` (Windows) / \`traceroute\` (Linux/macOS):** Shows the path (sequence of routers) packets take to reach a destination and measures latency to each hop. Uses ICMP or UDP.
+  * **\`nslookup\` (Windows/Linux/macOS) / \`dig\` (Linux/macOS):** Queries DNS servers to resolve hostnames to IP addresses and vice versa, or retrieve other DNS records.
+  * **\`arp -a\`:** Displays the ARP cache (IP address to MAC address mappings) on a local host.
+  * **\`netstat\` (Windows/Linux/macOS - older) / \`ss\` (Linux - newer):** Displays active network connections, listening ports, routing tables, and network interface statistics.
+  * **\`route print\` (Windows) / \`route -n\` or \`ip route show\` (Linux):** Displays the IP routing table.
+  * **\`pathping\` (Windows) / \`mtr\` (My Traceroute - Linux/macOS):** Combines features of \`ping\` and \`traceroute\`. Shows latency and packet loss statistics for each hop along a path.
+* **Other Software Tools:**
+  * **Wireshark:** (See Packet Sniffer under Network Monitoring)
+  * **DHCP Server Logs:** Can show IP address assignments, lease expirations, and errors.
+  * **Firewall Logs:** Show allowed and blocked traffic, potential attack attempts.
+* **Common Network Issues:**
+  * **No Connectivity:** Check physical connections, IP configuration, link lights, NIC status.
+  * **Intermittent Connectivity:** Could be loose cables, interference (wireless), duplex mismatch, failing hardware, STP reconvergence.
+  * **Slow Performance:** High bandwidth utilization, latency, network congestion, duplex mismatch, failing hardware, malware.
+  * **Incorrect IP Configuration:** Wrong IP address, subnet mask, default gateway, or DNS server.
+  * **Duplicate IP Address:** Two devices on the same network have the same IP address.
+  * **DNS Issues:** Incorrect DNS server configuration, DNS server down, DNS caching problems, name resolution failures.
+  * **Default Gateway Issues:** Incorrect gateway configured, gateway down, routing problems beyond the gateway.
+  * **Physical Layer Issues:** Bad cables, damaged connectors, incorrect cable type, interference, distance limitations exceeded, port failures.
+  * **Duplex Mismatch:** One side of a link is configured for full-duplex and the other for half-duplex, leading to collisions and poor performance.
+  * **Incorrect VLAN Assignment:** Device is in the wrong VLAN, cannot communicate with desired resources.
+  * **STP Issues:** Loops, blocked ports, slow convergence.
+  * **Routing Loops:** Packets bounce between routers without reaching the destination.
+  * **Firewall Blocking Traffic:** Legitimate traffic being blocked by firewall rules.
+  * **Wireless Interference:** From other Wi-Fi networks, Bluetooth devices, microwaves, cordless phones.
+  * **Incorrect SSID/Passphrase:** Client cannot connect to the wireless network.
+  * **Signal Strength Issues (Wireless):** Too far from AP, obstacles, antenna problems.
+  * **Power Issues:** Device not powered on, faulty power supply, PoE not working.
+  * **Exhausted DHCP Scope:** No more IP addresses available for assignment.
+  * **Blocked Ports (Security):** Necessary ports being blocked by ACLs or firewalls.
+  * **Certificate Issues (HTTPS/SSL/TLS):** Expired, revoked, or untrusted certificates.
+
+This list provides a strong foundation for understanding the terminology required for the CompTIA Network+ exam. Good luck with your studies!
+                ` // END OF THE VERY IMPORTANT MARKDOWN PLACEHOLDER
+
+          structuredVocabularyData =
+            parseMarkdownToStructuredData(markdownContent)
+
+          if (Object.keys(structuredVocabularyData).length === 0) {
+            throw new Error(
+              'No vocabulary terms or categories found in the provided content.'
+            )
+          }
+
+          initializeApp() // Initialize after data is structured
+          loadingMessageDiv.classList.add('hidden')
+          // showCategorySelectionView() is called by initializeApp if data is present
+        } catch (error) {
+          console.error('Error loading or parsing vocabulary:', error)
+          loadingMessageDiv.classList.add('hidden')
+          errorMessageDiv.textContent = `Error: ${error.message}. Please ensure the vocabulary content is correctly embedded.`
+          errorMessageDiv.classList.remove('hidden')
+          categorySelectionView.classList.add('hidden')
+          flashcardView.classList.add('hidden')
+        }
+      }
+
+      function initializeApp() {
+        if (Object.keys(structuredVocabularyData).length > 0) {
+          populateCategoryButtons()
+          showCategorySelectionView() // Start with category selection
+          flashcardDiv.addEventListener('click', flipCard)
+          prevCardButton.addEventListener('click', showPreviousCard)
+          nextCardButton.addEventListener('click', showNextCard)
+          returnToCategoriesButton.addEventListener(
+            'click',
+            showCategorySelectionView
+          )
+        } else {
+          errorMessageDiv.textContent =
+            'No vocabulary data loaded. Cannot initialize application.'
+          errorMessageDiv.classList.remove('hidden')
+          loadingMessageDiv.classList.add('hidden')
+        }
+      }
+
+      function populateCategoryButtons() {
+        categoryButtonsContainer.innerHTML = '' // Clear existing buttons
+        const sortedCategories = Object.keys(structuredVocabularyData).sort()
+
+        sortedCategories.forEach((categoryName) => {
+          if (
+            structuredVocabularyData[categoryName] &&
+            structuredVocabularyData[categoryName].length > 0
+          ) {
+            const button = document.createElement('button')
+            button.textContent = categoryName
+            button.classList.add('category-button-style')
+            button.setAttribute('title', `Study ${categoryName} terms`)
+            button.addEventListener('click', () => loadCategory(categoryName))
+            categoryButtonsContainer.appendChild(button)
+          }
+        })
+      }
+
+      function loadCategory(categoryName) {
+        currentCategory = categoryName
+        cardsInCurrentCategory = structuredVocabularyData[categoryName] || []
+        currentCardIndex = 0
+        if (currentCategoryDisplay)
+          currentCategoryDisplay.textContent = categoryName
+        displayCard()
+        showFlashcardView()
+      }
+
+      function displayCard() {
+        if (!cardsInCurrentCategory || cardsInCurrentCategory.length === 0) {
+          flashcardTermContentDiv.textContent = 'No cards in this category.'
+          flashcardDefinitionContentDiv.textContent =
+            'Please select another category or check data.'
+          updateCardCounter(true)
+          updateNavigationButtons()
+          return
+        }
+        const cardData = cardsInCurrentCategory[currentCardIndex]
+        flashcardTermContentDiv.textContent = cardData.term
+        flashcardDefinitionContentDiv.innerHTML = cardData.definition.replace(
+          /\n/g,
+          '<br>'
+        ) // Preserve line breaks
+
+        flashcardDiv.classList.remove('flipped')
+
+        const definitionFace = flashcardDiv.querySelector('.flashcard-back')
+        if (definitionFace) definitionFace.scrollTop = 0
+
+        updateCardCounter()
+        updateNavigationButtons()
+      }
+
+      function flipCard() {
+        flashcardDiv.classList.toggle('flipped')
+        if (flashcardDiv.classList.contains('flipped')) {
+          const definitionFace = flashcardDiv.querySelector('.flashcard-back')
+          if (definitionFace) definitionFace.scrollTop = 0
+        }
+      }
+
+      function showPreviousCard() {
+        if (currentCardIndex > 0) {
+          currentCardIndex--
+          displayCard()
+        }
+      }
+
+      function showNextCard() {
+        if (
+          cardsInCurrentCategory &&
+          currentCardIndex < cardsInCurrentCategory.length - 1
+        ) {
+          currentCardIndex++
+          displayCard()
+        }
+      }
+
+      function updateCardCounter(isEmpty = false) {
+        if (
+          isEmpty ||
+          !cardsInCurrentCategory ||
+          cardsInCurrentCategory.length === 0
+        ) {
+          cardCounterDisplay.textContent = `Card 0 of 0`
+        } else {
+          cardCounterDisplay.textContent = `Card ${currentCardIndex + 1} of ${
+            cardsInCurrentCategory.length
+          }`
+        }
+      }
+
+      function updateNavigationButtons() {
+        if (!cardsInCurrentCategory || cardsInCurrentCategory.length === 0) {
+          prevCardButton.disabled = true
+          nextCardButton.disabled = true
+          return
+        }
+        prevCardButton.disabled = currentCardIndex === 0
+        nextCardButton.disabled =
+          currentCardIndex >= cardsInCurrentCategory.length - 1
+      }
+
+      function showCategorySelectionView() {
+        categorySelectionView.classList.remove('hidden')
+        flashcardView.classList.add('hidden')
+        loadingMessageDiv.classList.add('hidden')
+      }
+
+      function showFlashcardView() {
+        categorySelectionView.classList.add('hidden')
+        flashcardView.classList.remove('hidden')
+        loadingMessageDiv.classList.add('hidden')
+      }
+
+      // Keyboard navigation for cards
+      document.addEventListener('keydown', (event) => {
+        if (flashcardView.classList.contains('hidden')) return // Only if flashcard view is active
+
+        if (event.key === 'ArrowLeft') {
+          showPreviousCard()
+        } else if (event.key === 'ArrowRight') {
+          showNextCard()
+        } else if (event.key === ' ' || event.key === 'Enter') {
+          // Prevent flipping if a button has focus and Enter is pressed
+          if (document.activeElement.tagName !== 'BUTTON') {
+            flipCard()
+            event.preventDefault() // Prevent space from scrolling page
+          }
+        }
+      })
+
+      // Start the application
+      loadVocabulary()
+    </script>
+  </body>
+</html>
